@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Tes couleurs Light Theme */
+  --v-background: #F4F7F6;
+  --v-surface: #FFFFFF;
+  --v-primary: #00796B;
+  --v-secondary: #00ACC1;
+  --v-on-surface: #0D1F1D;
+  --v-success: #2E7D32;
+}
+
+.dark {
+  /* Tes couleurs Dark Theme */
+  --v-background: #060F0E;
+  --v-surface: #0C1A19;
+  --v-primary: #00C9A7;
+  --v-secondary: #00B4D8;
+  --v-on-surface: #DFF2EF;
+  --v-success: #66BB6A;
+}
+
+@layer base {
+  html, body {
+    background-color: var(--v-background);
+    color: var(--v-on-surface);
+    transition: background-color 0.3s ease, color 0.3s ease;
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', sans-serif; /* Plus moderne pour la santé */
+  }
+
+  /* Style global pour les titres santé */
+  h1, h2, h3 {
+    color: var(--v-primary);
+    font-weight: 700;
+  }
+}
