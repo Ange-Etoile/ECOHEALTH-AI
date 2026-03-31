@@ -60,7 +60,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute} from 'vue-router'
 import { useDisplay } from 'vuetify'
 
 // Import de tes composants atomes
