@@ -72,7 +72,6 @@ import UserProfile from '@/components/layout/UserProfile.vue'
 
 const { mobile } = useDisplay()
 const route = useRoute()
-const router = useRouter()
 
 // États de la navigation
 const drawer = ref(true)
