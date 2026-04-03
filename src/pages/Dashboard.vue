@@ -33,7 +33,7 @@
 
       <div class="flex items-center gap-4 bg-surface-light p-2 rounded-2xl border border-outline-variant shadow-sm">
 
-        <div class="hidden sm:block px-4 border-l border-outline-variant">
+        <div class="hidden sm:block px-4  border-outline-variant">
           <p class="text-[9px] font-black opacity-40 uppercase tracking-widest leading-tight">Dernière Sync</p>
           <p class="text-sm font-mono font-bold">{{ lastSyncTime }}</p>
         </div>
