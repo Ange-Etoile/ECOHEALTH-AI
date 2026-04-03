@@ -24,6 +24,7 @@
     "vuetify": "^4.0.4"
   },
   "devDependencies": {
+    "@iconify/vue": "^5.0.0",
     "@types/node": "^24.12.0",
     "@vitejs/plugin-vue": "^6.0.5",
     "@vue/tsconfig": "^0.9.0",
