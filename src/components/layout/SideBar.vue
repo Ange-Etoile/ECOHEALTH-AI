@@ -35,7 +35,7 @@
       <div class="flex-1 overflow-y-auto overflow-x-hidden py-4 px-3 custom-scrollbar">
         <nav class="flex flex-col gap-1">
           <template v-for="(item, i) in menuItems" :key="i">
-            
+  
             <div
               v-if="item.heading && (!isRail || mobile)"
               class="text-[0.6rem] font-black tracking-[0.15em] text-on-surface/40 px-3 py-4 uppercase"
@@ -45,8 +45,14 @@
 
             <div v-else-if="item.heading && isRail && !mobile" class="h-px bg-on-surface/5 my-4 mx-2"></div>
 
+            <NavGroup
+              v-else-if="item.children"
+              :item="item"
+              :is-rail="isRail && !mobile"
+            />
+
             <NavLink
-              v-else-if="!item.heading"
+              v-else
               :item="item"
               :is-rail="isRail && !mobile"
               @click="handleNavClick"
@@ -80,6 +86,7 @@
 import { computed } from 'vue'
 import { useDisplay } from 'vuetify'
 import NavLink from '@/components/layout/NavItem.vue'
+import NavGroup from '@/components/layout/NavGroup.vue'
 
 const props = defineProps(['isRail', 'modelValue'])
 const emit = defineEmits(['update:modelValue'])
@@ -92,7 +99,15 @@ const drawerModel = computed({
 })
 const menuItems = [
   { heading: 'ANALYSE' },
-  { title: 'Dashboard',     icon: 'mdi-view-dashboard-outline',  to: '/' },
+  { 
+    title: 'Dashboard', 
+    icon: 'mdi-view-dashboard-outline', 
+    children: [
+      { title: 'Températures', to: '/dashboard/temp', icon: 'mdi-thermometer' },
+      { title: 'Sécheresse', to: '/dashboard/drought', icon: 'mdi-water-off' },
+      { title: 'Pollution', to: '/dashboard/pollution', icon: 'mdi-molecule' }
+    ]
+  },
   { title: 'Cartographie',  icon: 'mdi-map-search-outline',      to: '/map' },
   { heading: 'INTELLIGENCE' },
   { title: 'IA Santé',      icon: 'mdi-brain-outline',           to: '/health' },
