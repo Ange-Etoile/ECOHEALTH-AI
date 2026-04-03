@@ -1,7 +1,8 @@
 <template>
   <router-view />
+  <EcoChatBot />
 </template>
 
 <script setup lang="ts">
-// Pas besoin de logique ici, tout est géré par le router et les layouts
+import EcoChatBot from '@/components/EcoChatBot.vue'
 </script>
