@@ -17,7 +17,7 @@
       >
         <div class="relative shrink-0 w-9 h-9 group">
           <div class="w-9 h-9 rounded-xl border border-primary/35 bg-primary/10 flex items-center justify-center transition-transform group-hover:scale-105">
-            <v-icon size="20" class="text-primary">mdi-shield-plus</v-icon>
+            <v-icon color="primary" size="22">mdi-leaf</v-icon>
           </div>
           <div class="absolute -inset-1 rounded-[14px] border border-primary/20 animate-pulse"></div>
         </div>
