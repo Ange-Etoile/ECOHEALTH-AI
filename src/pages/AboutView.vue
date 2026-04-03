@@ -28,7 +28,7 @@ import TeamMemberCard from '@/components/about/TeamMemberCard.vue'
 const team = [
   {
     name: "NGO MATJABO PRICILLE ANGE ETOILE",
-    role: "Lead Developer & AI Engineer",
+    role: "Full Stack Developer",
     bio: "Developpeuse de l'application web de ECOHEALTH-AI. Expert en intégration de modèles de Deep Learning et architecture Full-stack (Laravel/Vue).",
     image: "/images/etoile.jpeg", 
     linkedin: "https://linkedin.com/in/ton-profil",
@@ -52,7 +52,7 @@ const team = [
   },
   {
     name: "TCHOUNKEU YANZEU IGOR VLADIMIR ",
-    role: " Biodiversité écologique et Environnementale",
+    role: "Ecological and Environmental Biodiversity",
     bio: "Spécialiste des dynamiques écologiques, il décode l'impact des variables météorologiques sur la dispersion des polluants. Son expertise permet de corréler les données climatiques brutes aux indicateurs de santé publique pour des prédictions IA de haute précision.",
     image: "/images/stephane.jpeg",
     linkedin: "https://www.linkedin.com/in/hervé-nguefa",
