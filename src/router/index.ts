@@ -1,6 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router'
-
-// Import de ton Layout principal
 import DashboardLayout from '@/components/layout/DashboardLayout.vue'
 
 const routes = [
@@ -27,7 +25,19 @@ const routes = [
         path: 'alerts', 
         name: 'Alertes',
         component: () => import('@/pages/Alerts.vue')
-      }
+      },
+      // Nouvelle route pour la page À Propos
+      {
+        path: 'about', 
+        name: 'About',
+        component: () => import('@/pages/AboutView.vue')
+      },
+      // // Optionnel : Route pour les paramètres
+      // {
+      //   path: 'settings', 
+      //   name: 'Settings',
+      //   component: () => import('@/pages/Settings.vue')
+      // }
     ]
   }
 ]

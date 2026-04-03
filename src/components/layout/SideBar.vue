@@ -112,6 +112,8 @@ const menuItems = [
   { heading: 'INTELLIGENCE' },
   { title: 'IA Santé',      icon: 'mdi-brain-outline',           to: '/health' },
   { title: 'Alertes Pollution', icon: 'mdi-alert-circle-outline', to: '/alerts', badge: 3 },
+  { heading: 'L\'ÉQUIPE' }, 
+  { title: 'À Propos',      icon: 'mdi-account-group-outline',   to: '/about' },
   { heading: 'SYSTÈME' },
   { title: 'Paramètres',    icon: 'mdi-cog-outline',             to: '/settings' },
 ]
