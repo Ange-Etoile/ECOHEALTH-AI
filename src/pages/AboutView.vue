@@ -6,7 +6,7 @@
         L'équipe <span class="text-primary italic">EcoHealth AI</span>
       </h1>
       <p class="text-on-surface/60 font-medium leading-relaxed">
-        Des étudiants en Master 1 SIA à l'Université de Douala unis pour transformer les données environnementales du Cameroun.
+        Des étudiants en Master 1  à l'Université de Douala unis pour transformer les données environnementales du Cameroun.
       </p>
     </section>
 
