@@ -1,54 +1,67 @@
 <template>
-  <div class="space-y-8 p-6">
-    <header class="flex flex-col gap-1">
-      <div class="flex items-center justify-between">
-        <div>
-          <h2 class="text-3xl font-black text-on-surface tracking-tighter italic">
-            Bonjour, Etoile
-          </h2>
-          <p class="text-sm text-on-surface/50 font-medium">
-            Analyse en temps réel — {{ selectedFilters.city || 'Cameroun' }}
-          </p>
+  <div class="max-w-7xl mx-auto space-y-10 p-6 text-on-surface transition-colors duration-500">
+    
+    <header class="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-outline-variant pb-10">
+      <div class="space-y-3">
+        <div class="flex items-center gap-3">
+          <div class="relative flex h-3 w-3">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
+          </div>
+          <span class="text-[10px] font-black uppercase tracking-[0.5em] text-primary">
+            Système de Surveillance Environnementale
+          </span>
         </div>
         
-        <v-progress-circular v-if="loading" indeterminate size="24" color="primary" />
+        <h2 class="text-5xl font-black tracking-tighter uppercase leading-none">
+          EcoHealth <span class="text-primary italic">AI</span> 
+          <span class="font-thin opacity-20 ml-2">Monitor</span>
+        </h2>
+        
+        <div class="flex items-center gap-4 text-[11px] font-bold uppercase tracking-widest opacity-60">
+          <span class="flex items-center gap-1">
+            <span class="iconify text-lg" data-icon="solar:map-point-bold-duotone"></span>
+            {{ selectedFilters.region || 'National' }}
+          </span>
+          <span class="opacity-20">|</span>
+          <span class="flex items-center gap-1">
+            <span class="iconify text-lg" data-icon="solar:city-bold-duotone"></span>
+            {{ selectedFilters.city || 'Toutes localités' }}
+          </span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-4 bg-surface-light p-2 rounded-2xl border border-outline-variant shadow-sm">
+
+        <div class="hidden sm:block px-4 border-l border-outline-variant">
+          <p class="text-[9px] font-black opacity-40 uppercase tracking-widest leading-tight">Dernière Sync</p>
+          <p class="text-sm font-mono font-bold">{{ lastSyncTime }}</p>
+        </div>
+        <v-btn
+          @click="loadAllData"
+          :loading="loading"
+          icon
+          color="primary"
+          variant="flat"
+          class="rounded-xl shadow-lg hover:scale-105 transition-all"
+          size="56"
+        >
+          <v-icon size="28">mdi-refresh</v-icon>
+          <v-tooltip activator="parent" location="top">Mettre à jour les données</v-tooltip>
+        </v-btn>
       </div>
     </header>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-      <v-select
-        v-model="selectedFilters.region"
-        :items="filterOptions.regions"
-        label="Région"
-        variant="solo-filled"
-        flat
-        density="compact"
-        class="rounded-xl"
-        clearable
+    <section class="relative">
+      <FilterBar 
+        v-model="selectedFilters" 
+        :options="filterOptions" 
+        :loading="loading"
+        @change="loadAllData"
       />
-      <v-select
-        v-model="selectedFilters.city"
-        :items="filterOptions.villes"
-        label="Ville"
-        variant="solo-filled"
-        flat
-        density="compact"
-        class="rounded-xl"
-        clearable
-      />
-      <v-select
-        v-model="selectedFilters.year"
-        :items="filterOptions.annees"
-        label="Année"
-        variant="solo-filled"
-        flat
-        density="compact"
-        class="rounded-xl"
-      />
-    </div>
+    </section>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-      
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
       <KPICard 
         label="Température Moyenne"
         :value="stats.temperature"
@@ -57,117 +70,95 @@
         :status="getTempStatus(stats.temperature)"
         color="primary"
       />
-
       <KPICard 
-        label="Qualité de l'Air"
+        label="Particules Fines (PM2.5)"
         :value="stats.pm25"
         unit="µg/m³"
-        icon="molecule" 
+        icon="dust" 
         :status="getAirStatus(stats.pm25)"
-        :color="stats.pm25 > 25 ? 'warning' : 'success'"
+        :color="stats.pm25 > 25 ? 'error' : 'success'"
       />
-
       <KPICard 
-        label="Indice Sécheresse"
+        label="Stress Hydrique"
         :value="stats.secheresse"
         unit="%"
         icon="drought" 
-        :status="stats.secheresse > 50 ? 'Saison Sèche' : 'Saison Humide'"
+        :status="stats.secheresse > 50 ? 'Critique' : 'Stable'"
         color="warning"
       />
-
       <KPICard 
-        label="Vitesse Vent"
+        label="Dynamique Éolienne"
         :value="stats.vent"
         unit="km/h"
         icon="wind" 
-        status="Vitesse Moyenne"
+        status="Vitesse de flux"
         color="primary"
       />
-
     </div>
-
-    <v-alert
-      v-if="!loading"
-      type="success"
-      variant="tonal"
-      class="mt-10 rounded-xl border border-primary/20 text-xs"
-      icon="mdi-check-circle-outline"
-    >
-      Données synchronisées avec le dataset  via Hugging Face.
-    </v-alert>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, computed } from 'vue'
+import { useTheme } from 'vuetify'
 import KPICard from '@/components/dashboard/KPICard.vue'
-import { getDashboardData, getFilterOptions } from '@/services/dataService'
+import FilterBar from '@/components/dashboard/FilterBar.vue'
+import { getDashboardData, getFilterOptions } from '@/services/dataService' 
 
-// --- ÉTATS ---
+const theme = useTheme()
+const isDark = computed(() => theme.global.current.value.dark)
+
+const toggleTheme = () => {
+  theme.global.name.value = isDark.value ? 'light' : 'dark'
+}
+
 const loading = ref(false)
-const stats = ref({
-  temperature: 0,
-  pm25: 0,
-  vent: 0,
-  secheresse: 0
-})
+const lastSyncTime = ref('--:--:--')
+const stats = ref({ temperature: 0, pm25: 0, vent: 0, secheresse: 0 })
 
-const filterOptions = ref({
-  regions: [],
-  villes: [],
-  annees: []
-})
+const filterOptions = ref({ regions: [], citiesData: {}, annees: [] })
+const selectedFilters = ref({ region: null, city: null, year: 2025 })
 
-const selectedFilters = ref({
-  region: null,
-  city: null,
-  year: 2025
-})
-
-// --- LOGIQUE DE RÉCUPÉRATION ---
 const loadAllData = async () => {
   loading.value = true
   try {
     const data = await getDashboardData(selectedFilters.value)
     stats.value = data
-  } catch (error) {
-    console.error("Erreur lors du chargement des KPI:", error)
+    lastSyncTime.value = new Date().toLocaleTimeString('fr-FR', { hour12: false })
+  } catch (e) {
+    console.error("Erreur de synchronisation", e)
   } finally {
-    loading.value = false
+    // Petit délai pour simuler le calcul IA et rendre l'animation visible
+    setTimeout(() => { loading.value = false }, 800)
   }
 }
 
 const loadFilters = async () => {
-  try {
-    const options = await getFilterOptions()
-    filterOptions.value = options
-  } catch (error) {
-    console.error("Erreur lors du chargement des filtres:", error)
-  }
+  const options = await getFilterOptions()
+  filterOptions.value = options
 }
 
-// --- HELPERS (LOGIQUE IA/MÉTÉO) ---
-const getAirStatus = (val: number) => {
-  if (val <= 12) return 'Excellent'
-  if (val <= 35) return 'Modéré'
-  return 'Mauvais pour la santé'
-}
+const getAirStatus = (val: number) => val <= 12 ? 'Qualité Optimale' : val <= 35 ? 'Vigilance' : 'Alerte Sanitaire'
+const getTempStatus = (val: number) => val > 32 ? 'Anomalie Thermique' : 'Stabilité Saisonnière'
 
-const getTempStatus = (val: number) => {
-  if (val > 30) return 'Chaleur Intense'
-  if (val > 22) return 'Tropical'
-  return 'Frais'
-}
-
-// --- CYCLE DE VIE ---
 onMounted(() => {
   loadFilters()
   loadAllData()
 })
-
-// Observer les changements de filtres pour recharger l'API automatiquement
-watch(selectedFilters, () => {
-  loadAllData()
-}, { deep: true })
 </script>
+
+<style scoped>
+/* Effet de glassmorphism léger sur le header */
+header {
+  background: radial-gradient(circle at top left, rgba(var(--v-theme-primary), 0.03), transparent);
+}
+
+/* Animation personnalisée pour le bouton refresh quand loading */
+:deep(.v-btn--loading .iconify) {
+  display: none;
+}
+
+.text-on-surface {
+  color: rgb(var(--v-theme-on-surface));
+}
+</style>

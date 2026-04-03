@@ -57,17 +57,18 @@ const props = defineProps<{
   color?: 'success' | 'warning' | 'error' | 'primary'
 }>()
 
-// Mapping robuste des icônes
+// Dans KPICard.vue
 const weatherIcon = computed(() => {
   const map: Record<string, string> = {
-    'sun': 'wi:day-sunny',
-    'rain': 'wi:rain',
-    'cloud': 'wi:cloudy',
-    'wind': 'wi:strong-wind',
-    'dust': 'wi:dust',
     'temp': 'wi:thermometer',
-    'drought': 'wi:hot'
+    'dust': 'wi:dust',     
+    'molecule': 'wi:dust', 
+    'wind': 'wi:strong-wind',
+    'drought': 'wi:hot',
+    'sun': 'wi:day-sunny',
+    'rain': 'wi:rain'
   }
+  if (props.icon.includes(':')) return props.icon
   return map[props.icon] || 'wi:na'
 })
 
