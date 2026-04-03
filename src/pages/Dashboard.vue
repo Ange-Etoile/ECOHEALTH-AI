@@ -99,18 +99,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
-import { useTheme } from 'vuetify'
+import { ref, onMounted} from 'vue'
 import KPICard from '@/components/dashboard/KPICard.vue'
 import FilterBar from '@/components/dashboard/FilterBar.vue'
 import { getDashboardData, getFilterOptions } from '@/services/dataService' 
-
-const theme = useTheme()
-const isDark = computed(() => theme.global.current.value.dark)
-
-const toggleTheme = () => {
-  theme.global.name.value = isDark.value ? 'light' : 'dark'
-}
 
 const loading = ref(false)
 const lastSyncTime = ref('--:--:--')
