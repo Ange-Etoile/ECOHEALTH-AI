@@ -38,7 +38,7 @@ const team = [
     name: "WANDJI NGABO STEPHANE JUNIOR",
     role: "Data Scientist",
     bio: "Analyse statistique et traitement du dataset Indabax. Spécialiste Python et visualisation de données.",
-    image: "/images/W_stephane.jpeg", 
+    image: "/images/stephane_W.jpeg", 
     linkedin: "https://www.linkedin.com/in/stephane-wandji-800929287",
     github: "https://github.com/stephade4"
   },
@@ -54,7 +54,7 @@ const team = [
     name: "TCHOUNKEU YANZEU IGOR VLADIMIR ",
     role: "Ecological and Environmental Biodiversity",
     bio: "Spécialiste des dynamiques écologiques, il décode l'impact des variables météorologiques sur la dispersion des polluants. Son expertise permet de corréler les données climatiques brutes aux indicateurs de santé publique pour des prédictions IA de haute précision.",
-    image: "/images/stephane.jpeg",
+    image: "/images/vladimir.jpeg",
     linkedin: "https://www.linkedin.com/in/hervé-nguefa",
     github: "https://github.com/herve237ddf"
   }
