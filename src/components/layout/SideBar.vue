@@ -100,12 +100,34 @@ const drawerModel = computed({
 const menuItems = [
   { heading: 'ANALYSE' },
   { 
-    title: 'Dashboard', 
-    icon: 'mdi-view-dashboard-outline', 
+  title: 'Tableau de Bord', 
+  icon: 'mdi-view-dashboard-outline', 
     children: [
-      { title: 'Températures', to: '/dashboard/temp', icon: 'mdi-thermometer' },
-      { title: 'Sécheresse', to: '/dashboard/drought', icon: 'mdi-water-off' },
-      { title: 'Pollution', to: '/dashboard/pollution', icon: 'mdi-molecule' }
+      { 
+        title: 'Vue d’Ensemble', 
+        to: '/dashboard/overview', 
+        icon: 'mdi-monitor-dashboard' 
+      },
+      { 
+        title: 'Analyses Thermiques', 
+        to: '/dashboard/temp', 
+        icon: 'mdi-thermometer-alert' 
+      },
+      { 
+        title: 'Indice Sécheresse', 
+        to: '/dashboard/drought', 
+        icon: 'mdi-water-off-outline' 
+      },
+      { 
+        title: 'Qualité de l’Air', 
+        to: '/dashboard/pollution', 
+        icon: 'mdi-molecule' 
+      },
+      { 
+        title: 'Carte Interactive', 
+        to: '/dashboard/map', 
+        icon: 'mdi-map-marker-radius' 
+      }
     ]
   },
   { title: 'Cartographie',  icon: 'mdi-map-search-outline',      to: '/map' },
