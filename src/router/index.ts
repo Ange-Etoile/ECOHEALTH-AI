@@ -26,6 +26,11 @@ const routes = [
       name: 'Analyses Thermiques',
       component: () => import('@/pages/ThermalAnalysis.vue'),
       },
+      { 
+      path: 'correlations', 
+      name: 'Correlations',
+      component: () => import('@/pages/CorrelationsView.vue'),
+      },
       {
         path: 'alerts', 
         name: 'Alertes',

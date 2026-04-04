@@ -109,6 +109,11 @@ const menuItems = [
         icon: 'mdi-monitor-dashboard' 
       },
       { 
+      title: 'Analyse des Corrélations', 
+      to: '/correlations', 
+      icon: 'mdi-chart-scatter-plot' 
+      },
+      { 
         title: 'Analyses Thermiques', 
         to: '/temp', 
         icon: 'mdi-thermometer-alert' 
