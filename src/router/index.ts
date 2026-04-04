@@ -31,6 +31,11 @@ const routes = [
       name: 'Correlations',
       component: () => import('@/pages/CorrelationsView.vue'),
       },
+      { 
+        path: 'sunshine-hydric', 
+        name: 'SunshineHydric',
+        component: () => import('@/pages/SunshineAnalysis.vue'), 
+      },
       {
         path: 'alerts', 
         name: 'Alertes',

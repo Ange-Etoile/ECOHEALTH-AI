@@ -109,9 +109,9 @@ const menuItems = [
         icon: 'mdi-monitor-dashboard' 
       },
       { 
-      title: 'Analyse des Corrélations', 
-      to: '/correlations', 
-      icon: 'mdi-chart-scatter-plot' 
+        title: 'Analyse des Corrélations', 
+        to: '/correlations', 
+        icon: 'mdi-chart-scatter-plot' 
       },
       { 
         title: 'Analyses Thermiques', 
@@ -119,19 +119,14 @@ const menuItems = [
         icon: 'mdi-thermometer-alert' 
       },
       { 
-        title: 'Indice Sécheresse', 
-        to: '/dashboard/drought', 
-        icon: 'mdi-water-off-outline' 
+        title: 'Bilan Solaire & Hydrique', 
+        to: '/sunshine-hydric', 
+        icon: 'mdi-weather-sunny-alert' 
       },
       { 
-        title: 'Qualité de l’Air', 
-        to: '/dashboard/pollution', 
-        icon: 'mdi-molecule' 
-      },
-      { 
-        title: 'Carte Interactive', 
-        to: '/dashboard/map', 
-        icon: 'mdi-map-marker-radius' 
+        title: 'Profils Régionaux', 
+        to: '/dashboard/regional', 
+        icon: 'mdi-city-variant-outline' 
       }
     ]
   },

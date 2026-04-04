@@ -22,3 +22,7 @@ export const getAnalysisData = async (filters: any) => {
   const response = await api.get('/api/analysis/correlations', { params: filters });
   return response.data;
 };
+export const getSunshineData = async (filters:any) => {
+  const response = await api.get('/api/analysis/sunshine', { params: { year: filters.year } });
+  return response.data;
+};
