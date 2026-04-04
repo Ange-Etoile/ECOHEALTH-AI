@@ -117,7 +117,6 @@ const factors = [
   { title: 'Rayonnement Solaire', value: 'shortwave_radiation_sum' },
   { title: 'Précipitations', value: 'precipitation_sum' },
   { title: 'Vitesse du Vent', value: 'wind_speed_10m_max' },
-  { title: 'Humidité', value: 'humidity' },
   { title: 'Température', value: 'temperature_2m_mean' }
 ]
 
@@ -179,8 +178,8 @@ const updateCharts = () => {
 const renderDynamicHeatmap = (textColor) => {
   if (!analysisData.value.length) return
   
-  const keys = ['temperature_2m_mean', 'shortwave_radiation_sum', 'precipitation_sum', 'pm25_proxy', 'humidity', 'wind_speed_10m_max']
-  const labels = ['Temp', 'Solaire', 'Pluie', 'PM2.5', 'Humidité', 'Vent']
+  const keys = ['temperature_2m_mean', 'shortwave_radiation_sum', 'precipitation_sum', 'pm25_proxy',  'wind_speed_10m_max']
+  const labels = ['Temp', 'Solaire', 'Pluie', 'PM2.5', 'Vent']
   
   // Calcul de la matrice de corrélation réelle sur les données filtrées
   const zValues = keys.map(key1 => 
