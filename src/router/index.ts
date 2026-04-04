@@ -52,6 +52,11 @@ const routes = [
         name: 'About',
         component: () => import('@/pages/AboutView.vue')
       },
+      {
+        path: 'documentation', 
+        name: 'Documentation',
+        component: () => import('@/pages/Documentation.vue')
+      },
       // // Optionnel : Route pour les paramètres
       // {
       //   path: 'settings', 

@@ -137,6 +137,7 @@ const menuItems = [
   { heading: 'L\'ÉQUIPE' }, 
   { title: 'À Propos',      icon: 'mdi-account-group-outline',   to: '/about' },
   { heading: 'SYSTÈME' },
+  { title: 'Documentation',     icon: 'mdi-file-document-outline',   to: '/documentation' },
   { title: 'Paramètres',    icon: 'mdi-cog-outline',             to: '/settings' },
 ]
 
