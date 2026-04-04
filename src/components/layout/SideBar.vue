@@ -125,7 +125,7 @@ const menuItems = [
       },
       { 
         title: 'Profils Régionaux', 
-        to: '/dashboard/regional', 
+        to: '/regional-benchmark', 
         icon: 'mdi-city-variant-outline' 
       }
     ]

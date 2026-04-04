@@ -26,3 +26,9 @@ export const getSunshineData = async (filters:any) => {
   const response = await api.get('/api/analysis/sunshine', { params: { year: filters.year } });
   return response.data;
 };
+export const getComparativeData = async (variable: string, year: number) => {
+  const response = await api.get('/api/analysis/comparative', { 
+    params: { variable, year } 
+  });
+  return response.data;
+};

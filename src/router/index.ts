@@ -36,6 +36,11 @@ const routes = [
         name: 'SunshineHydric',
         component: () => import('@/pages/SunshineAnalysis.vue'), 
       },
+      { 
+        path: 'regional-benchmark', 
+        name: 'RegionalBenchmark',
+        component: () => import('@/pages/RegionalProfile.vue'), 
+      },
       {
         path: 'alerts', 
         name: 'Alertes',
