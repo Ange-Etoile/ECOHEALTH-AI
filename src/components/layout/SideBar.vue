@@ -105,12 +105,12 @@ const menuItems = [
     children: [
       { 
         title: 'Vue d’Ensemble', 
-        to: '/dashboard/overview', 
+        to: '/', 
         icon: 'mdi-monitor-dashboard' 
       },
       { 
         title: 'Analyses Thermiques', 
-        to: '/dashboard/temp', 
+        to: '/temp', 
         icon: 'mdi-thermometer-alert' 
       },
       { 

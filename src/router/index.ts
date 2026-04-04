@@ -21,6 +21,11 @@ const routes = [
         name: 'IA Santé',
         component: () => import('@/pages/HealthAI.vue')
       },
+      { 
+      path: 'temp', 
+      name: 'Analyses Thermiques',
+      component: () => import('@/pages/ThermalAnalysis.vue'),
+      },
       {
         path: 'alerts', 
         name: 'Alertes',
