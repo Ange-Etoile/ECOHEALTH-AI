@@ -21,11 +21,11 @@
       <FilterBar v-model="selectedFilters" :options="filterOptions" :loading="loading" @change="loadAnalysis" />
     </v-card>
 
-    <v-row>
+    <v-row v-if="!loading || analysisData.length > 0">
       <v-col cols="12" lg="6">
         <v-card variant="outlined" class="rounded-3xl border-outline-variant bg-surface h-full overflow-hidden shadow-sm">
           <div class="p-4 border-b border-outline-variant bg-surface-variant/10 flex justify-between items-center">
-            <span class="text-[10px] font-black uppercase tracking-widest">Matrice de Pearson (Temps Réel)</span>
+            <span class="text-[10px] font-black uppercase tracking-widest">Matrice de Pearson (Interactions)</span>
             <v-chip size="x-small" color="secondary" variant="flat">DYNAMIQUE</v-chip>
           </div>
           <div class="relative w-full h-[350px] md:h-[450px]">
@@ -38,7 +38,7 @@
         <v-card variant="outlined" class="rounded-3xl border-outline-variant bg-surface h-full overflow-hidden shadow-sm">
           <div class="p-4 border-b border-outline-variant bg-surface-variant/10 flex justify-between items-center">
             <div class="flex items-center gap-2">
-              <span class="text-[10px] font-black uppercase tracking-widest">Analyse Variable :</span>
+              <span class="text-[10px] font-black uppercase tracking-widest">Focus Variable :</span>
               <v-select
                 v-model="activeFactor"
                 :items="factors"
@@ -58,39 +58,51 @@
       </v-col>
     </v-row>
 
-    <v-card variant="outlined" class="rounded-3xl p-6 md:p-8 border-outline-variant bg-surface shadow-sm">
+    <v-card variant="outlined" class="rounded-3xl p-6 md:p-8 border-outline-variant bg-surface shadow-sm mt-6">
       <div class="flex items-center gap-3 mb-8 border-b border-outline-variant pb-4">
         <v-avatar color="secondary" variant="tonal" size="32">
-          <v-icon size="18">mdi-microscope</v-icon>
+          <v-icon size="18">mdi-brain</v-icon>
         </v-avatar>
-        <h3 class="text-sm font-black uppercase tracking-widest">Diagnostic Environnemental : {{ selectedFilters.city || selectedFilters.region || 'Secteur National' }}</h3>
+        <h3 class="text-sm font-black uppercase tracking-widest">Interprétation du Modèle Environnemental</h3>
       </div>
       
-      <div v-if="analysisData.length > 0" class="grid grid-cols-1 md:grid-cols-2 gap-10">
-        <div class="space-y-4 text-sm leading-relaxed text-justify">
+      <div v-if="analysisData.length > 0" class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+        
+        <div class="lg:col-span-3 space-y-4 text-sm leading-relaxed text-justify">
           <div class="flex items-center gap-2 text-secondary font-bold text-[10px] uppercase tracking-wider">
-            <v-icon size="small">mdi-brain</v-icon> Analyse des corrélations observées
+            <v-icon size="small">mdi-text-search</v-icon> Analyse du comportement des polluants
           </div>
-          <p v-html="generateObservation"></p>
+          <div class="bg-surface-variant/5 p-5 rounded-2xl border border-outline-variant/50">
+             <p v-html="generateObservation"></p>
+          </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-4">
+        <div class="lg:col-span-2 grid grid-cols-2 gap-3">
           <div class="p-4 rounded-2xl border border-outline-variant bg-surface-variant/5">
-            <span class="text-[9px] font-bold uppercase opacity-60 block text-primary">Dispersion (Vent)</span>
+            <span class="text-[9px] font-bold uppercase opacity-60 block text-blue-darken-2">Précipitations</span>
+            <span class="text-xl font-black">{{ avgRain }} <small class="text-[10px]">mm</small></span>
+          </div>
+          <div class="p-4 rounded-2xl border border-outline-variant bg-surface-variant/5">
+            <span class="text-[9px] font-bold uppercase opacity-60 block text-orange-darken-2">Solaire</span>
+            <span class="text-xl font-black">{{ avgRad }} <small class="text-[10px]">W/m²</small></span>
+          </div>
+          <div class="p-4 rounded-2xl border border-outline-variant bg-surface-variant/5">
+            <span class="text-[9px] font-bold uppercase opacity-60 block text-green-darken-2">Vitesse Vent</span>
             <span class="text-xl font-black">{{ avgWind }} <small class="text-[10px]">km/h</small></span>
           </div>
           <div class="p-4 rounded-2xl border border-outline-variant bg-surface-variant/5">
-            <span class="text-[9px] font-bold uppercase opacity-60 block text-blue">Lessivage (Pluie)</span>
-            <span class="text-xl font-black">{{ avgRain }} <small class="text-[10px]">mm</small></span>
+            <span class="text-[9px] font-bold uppercase opacity-60 block text-red-lighten-1">Température</span>
+            <span class="text-xl font-black">{{ avgTemp }} <small class="text-[10px]">°C</small></span>
           </div>
           <div class="p-4 rounded-2xl border border-outline-variant bg-surface-variant/10 col-span-2 flex justify-between items-center">
             <div>
-              <span class="text-[9px] font-bold uppercase opacity-60 block">Moyenne PM2.5</span>
+              <span class="text-[9px] font-bold uppercase opacity-60 block">Niveau Moyen PM2.5</span>
               <div class="text-2xl font-black text-secondary">{{ avgPM25 }} <small class="text-[10px]">µg/m³</small></div>
             </div>
             <v-chip :color="pmStatusColor" size="small" class="font-black uppercase text-[10px]">{{ pmStatusText }}</v-chip>
           </div>
         </div>
+
       </div>
       <div v-else class="flex justify-center py-10">
         <v-progress-circular indeterminate color="secondary"></v-progress-circular>
@@ -100,7 +112,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, nextTick, computed, watch } from 'vue'
+import { ref, onMounted, nextTick, computed, watch } from 'vue'
 import Plotly from 'plotly.js-dist-min'
 import FilterBar from '@/components/dashboard/FilterBar.vue'
 import { getFilterOptions, getAnalysisData } from '@/services/dataService'
@@ -120,9 +132,9 @@ const factors = [
   { title: 'Température', value: 'temperature_2m_mean' }
 ]
 
-// --- MATHS : CORRÉLATION DE PEARSON ---
+// --- MATHS : CORRÉLATION ---
 const getPearsonCorrelation = (x, y) => {
-  const n = x.length; if (n === 0) return 0;
+  const n = x.length; if (n < 2) return 0;
   const muX = x.reduce((a, b) => a + b, 0) / n;
   const muY = y.reduce((a, b) => a + b, 0) / n;
   const num = x.reduce((acc, val, i) => acc + (val - muX) * (y[i] - muY), 0);
@@ -135,53 +147,78 @@ const avgPM25 = computed(() => analysisData.value.length ? (analysisData.value.r
 const avgRain = computed(() => analysisData.value.length ? (analysisData.value.reduce((acc, d) => acc + d.precipitation_sum, 0) / analysisData.value.length).toFixed(1) : 0)
 const avgWind = computed(() => analysisData.value.length ? (analysisData.value.reduce((acc, d) => acc + d.wind_speed_10m_max, 0) / analysisData.value.length).toFixed(1) : 0)
 const avgRad = computed(() => analysisData.value.length ? (analysisData.value.reduce((acc, d) => acc + d.shortwave_radiation_sum, 0) / analysisData.value.length).toFixed(0) : 0)
+const avgTemp = computed(() => analysisData.value.length ? (analysisData.value.reduce((acc, d) => acc + d.temperature_2m_mean, 0) / analysisData.value.length).toFixed(1) : 0)
 
 const pmStatusColor = computed(() => parseFloat(avgPM25.value) < 25 ? 'success' : 'error')
 const pmStatusText = computed(() => parseFloat(avgPM25.value) < 25 ? 'Air Sain' : 'Air Pollué')
 
+// --- LOGIQUE D'INTERPRÉTATION AVANCÉE ---
 const generateObservation = computed(() => {
   if (!analysisData.value.length) return ""
+  
   const zone = selectedFilters.value.city || selectedFilters.value.region || 'nationale'
-  const year = selectedFilters.value.year
-  
-  // Calcul de la corrélation réelle Solaire/PM2.5 pour le texte
-  const corrSolaire = getPearsonCorrelation(analysisData.value.map(d => d.shortwave_radiation_sum), analysisData.value.map(d => d.pm25_proxy)).toFixed(2)
+  const pm = parseFloat(avgPM25.value)
+  const rain = parseFloat(avgRain.value)
+  const wind = parseFloat(avgWind.value)
+  const rad = parseFloat(avgRad.value)
 
-  let html = `Pour l'année <strong>${year}</strong> à <strong>${zone}</strong>, la matrice confirme une corrélation de <strong>${corrSolaire}</strong> entre le rayonnement et les particules. `
+  const corrSolaire = getPearsonCorrelation(analysisData.value.map(d => d.shortwave_radiation_sum), analysisData.value.map(d => d.pm25_proxy))
+  const corrVent = getPearsonCorrelation(analysisData.value.map(d => d.wind_speed_10m_max), analysisData.value.map(d => d.pm25_proxy))
+  const corrPluie = getPearsonCorrelation(analysisData.value.map(d => d.precipitation_sum), analysisData.value.map(d => d.pm25_proxy))
+
+  let intro = `L'analyse des données pour <strong>${zone}</strong> révèle un écosystème où la qualité de l'air (PM2.5) est étroitement liée aux conditions météo. <br><br>`
   
-  if (parseFloat(avgRain.value) > 10) {
-    html += `L'impact des précipitations (moyenne ${avgRain.value}mm) agit comme un filtre naturel, tandis que `
+  let solarDetail = ""
+  if (corrSolaire > 0.3) {
+    solarDetail = `Le <strong>rayonnement solaire</strong> (${rad} W/m²) présente une corrélation positive forte (${corrSolaire.toFixed(2)}). Cela indique que le soleil favorise des réactions photochimiques augmentant la concentration des particules fines.`
   } else {
-    html += `La faible pluviométrie accentue la persistance des PM2.5. De plus, `
+    solarDetail = `L'impact du rayonnement solaire semble modéré sur cette période, ne constituant pas le facteur principal de pollution.`
   }
 
-  if (parseFloat(avgWind.value) > 15) {
-    html += `une vitesse de vent de ${avgWind.value}km/h favorise une dispersion rapide des polluants vers l'extérieur de la zone.`
+  let cleanEffect = ""
+  if (rain > 10 || corrPluie < -0.2) {
+    cleanEffect = `Les <strong>précipitations</strong> (${rain} mm) jouent un rôle de "lessivage" efficace, aidant à rabattre les particules au sol et à assainir l'air.`
   } else {
-    html += `la faiblesse des vents (${avgWind.value}km/h) crée un effet de confinement thermique.`
+    cleanEffect = `La faible pluviométrie limite le nettoyage naturel de l'atmosphère, favorisant la stagnation des polluants.`
   }
-  return html
+
+  let windEffect = ""
+  if (wind > 15 || corrVent < -0.3) {
+    windEffect = `Le <strong>vent</strong> (${wind} km/h) agit comme un moteur de dispersion. Sa corrélation négative montre qu'une augmentation de la vitesse du vent réduit significativement la densité de PM2.5.`
+  } else {
+    windEffect = `La faiblesse des courants aériens (${wind} km/h) crée un phénomène de confinement, empêchant l'évacuation des micro-particules.`
+  }
+
+  // --- SEUILS SELON LES DIRECTIVES DE L'OMS ---
+  let statusDetail = ""
+  if (pm <= 15) {
+    statusDetail = `<br><br><span class="text-success font-bold">Qualité Excellente :</span> Avec une moyenne de ${pm} µg/m³, l'air respecte l'objectif de santé publique de l'<strong>OMS</strong> (≤ 15 µg/m³).`
+  } else if (pm <= 25) {
+    statusDetail = `<br><br><span class="text-warning font-bold">Qualité Modérée :</span> Le niveau dépasse l'objectif idéal mais reste sous le seuil critique de pollution de 25 µg/m³.`
+  } else {
+    statusDetail = `<br><br><span class="text-error font-bold">Alerte Pollution :</span> La concentration dépasse le seuil de <strong>25 µg/m³</strong> fixé par les normes internationales de l'OMS.`
+  }
+
+  return `${intro} 1. ${solarDetail} <br> 2. ${cleanEffect} <br> 3. ${windEffect} ${statusDetail}`
 })
 
-// --- GRAPHES ---
 const updateCharts = () => {
+  if (!analysisData.value.length) return
   const isDark = theme.global.current.value.dark
   const textColor = isDark ? '#FFFFFF' : '#424242'
   const gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)'
 
-  nextTick(() => {
-    renderDynamicHeatmap(textColor)
-    renderScatter(textColor, gridColor)
-  })
+  setTimeout(() => {
+    nextTick(() => {
+      renderDynamicHeatmap(textColor)
+      renderScatter(textColor, gridColor)
+    })
+  }, 50)
 }
 
 const renderDynamicHeatmap = (textColor) => {
-  if (!analysisData.value.length) return
-  
-  const keys = ['temperature_2m_mean', 'shortwave_radiation_sum', 'precipitation_sum', 'pm25_proxy',  'wind_speed_10m_max']
+  const keys = ['temperature_2m_mean', 'shortwave_radiation_sum', 'precipitation_sum', 'pm25_proxy', 'wind_speed_10m_max']
   const labels = ['Temp', 'Solaire', 'Pluie', 'PM2.5', 'Vent']
-  
-  // Calcul de la matrice de corrélation réelle sur les données filtrées
   const zValues = keys.map(key1 => 
     keys.map(key2 => getPearsonCorrelation(analysisData.value.map(d => d[key1]), analysisData.value.map(d => d[key2])))
   )
@@ -198,12 +235,11 @@ const renderDynamicHeatmap = (textColor) => {
 
 const renderScatter = (textColor, gridColor) => {
   const factor = factors.find(f => f.value === activeFactor.value)
-  
   Plotly.react('scatterChart', [{
     x: analysisData.value.map(d => d[activeFactor.value]),
     y: analysisData.value.map(d => d.pm25_proxy),
-    mode: 'markers',
-    marker: { size: 8, color: '#FF5252', opacity: 0.5, line: { width: 1, color: textColor } }
+    mode: 'markers', type: 'scattergl',
+    marker: { size: 6, color: '#FF5252', opacity: 0.4, line: { width: 0.5, color: textColor } }
   }], {
     paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
     margin: { t: 30, b: 50, l: 50, r: 20 }, font: { color: textColor, size: 10 },
@@ -213,6 +249,7 @@ const renderScatter = (textColor, gridColor) => {
 }
 
 const loadAnalysis = async () => {
+  if (loading.value) return 
   loading.value = true
   try {
     const data = await getAnalysisData(selectedFilters.value)
@@ -222,7 +259,6 @@ const loadAnalysis = async () => {
 }
 
 watch(() => theme.global.current.value.dark, () => updateCharts())
-
 onMounted(async () => {
   filterOptions.value = await getFilterOptions()
   loadAnalysis()
