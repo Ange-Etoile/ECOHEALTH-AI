@@ -9,9 +9,9 @@
       <div class="flex flex-col h-screen overflow-hidden">
         
         <header 
-          class="flex-none h-16 min-h-[64px] flex items-center justify-between px-4 md:px-8 bg-surface/80 backdrop-blur-md sticky top-0 z-20 border-b border-on-surface/5"
+          class="flex-none h-16 min-h-[64px] flex items-center justify-between px-2 md:px-8 bg-surface/80 backdrop-blur-md sticky top-0 z-20 border-b border-on-surface/5"
         >
-          <div class="flex items-center gap-4 h-full">
+          <div class="flex items-center gap-2 md:gap-4 h-full">
             <button 
               v-if="mobile"
               @click="drawer = !drawer"
@@ -26,7 +26,7 @@
               @toggle="isRail = !isRail" 
             />
 
-            <h1 class="text-sm md:text-base font-black text-on-surface tracking-tight ml-2 truncate max-w-[150px] md:max-w-none">
+            <h1 class="text-sm md:text-base font-black text-on-surface tracking-tight ml-1 md:ml-2 truncate max-w-[150px] md:max-w-none">
               {{ currentRouteName }}
             </h1>
           </div>

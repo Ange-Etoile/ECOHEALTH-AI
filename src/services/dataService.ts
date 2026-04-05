@@ -32,3 +32,7 @@ export const getComparativeData = async (variable: string, year: number) => {
   });
   return response.data;
 };
+export const sendChatMessage = async (message: string) => {
+  const response = await api.post('/api/chat', { message });
+  return response.data;
+};
