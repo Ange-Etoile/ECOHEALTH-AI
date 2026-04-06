@@ -38,7 +38,7 @@
   
             <div
               v-if="item.heading && (!isRail || mobile)"
-              class="text-[0.6rem] font-black tracking-[0.15em] text-on-surface/40 px-3 py-4 uppercase"
+              class="text-[0.6rem] font-black tracking-[0.15em] text-on-surface/40 px-3 py-2 uppercase"
             >
               {{ item.heading }}
             </div>
@@ -134,7 +134,7 @@ const menuItems = [
   { heading: 'MODELS' },
   { title: 'Performance IA', to: '/performance-ia', icon: 'mdi-brain' },
   { heading: 'INTELLIGENCE' },
-  { title: 'IA Santé',      icon: 'mdi-brain-outline',           to: '/health' },
+  { title: 'Prévisions 2026', icon: 'mdi-crystal-ball', to: '/predictions-2026' },
   { title: 'Alertes Pollution', icon: 'mdi-alert-circle-outline', to: '/alerts', badge: 3 },
   { heading: 'L\'ÉQUIPE' }, 
   { title: 'À Propos',      icon: 'mdi-account-group-outline',   to: '/about' },

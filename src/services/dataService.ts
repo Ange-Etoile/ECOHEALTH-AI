@@ -44,3 +44,7 @@ export const getMLPerformance = async () => {
   const response = await api.get('/api/ml-performance');
   return response.data;
 };
+export const getGeneralPredictions = async () => {
+  const response = await api.get('/api/predict/general-2026');
+  return response.data;
+};
