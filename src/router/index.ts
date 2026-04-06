@@ -12,6 +12,11 @@ const routes = [
         component: () => import('@/pages/Dashboard.vue')
       },
       {
+        path: 'cycles', 
+        name: 'CyclesPollution',
+        component: () => import('@/pages/CyclesAnalysis.vue')
+      },
+      {
         path: 'map', 
         name: 'Cartographie',
         component: () => import('@/pages/Map.vue')

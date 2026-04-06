@@ -14,7 +14,7 @@
         </span>
         
         <div class="flex items-baseline flex-wrap gap-1">
-          <span class="text-2xl sm:text-xl font-black tracking-tighter text-on-surface truncate">
+          <span class="text-xl sm:text-xl font-black tracking-tighter text-on-surface">
             {{ value }}
           </span>
           <span v-if="unit" class="text-xs font-bold text-on-surface/30 lowercase">

@@ -109,14 +109,14 @@ const menuItems = [
         icon: 'mdi-monitor-dashboard' 
       },
       { 
+        title: 'Cycles de Pollution', 
+        to: '/cycles', 
+        icon: 'mdi-sync' 
+      },
+      { 
         title: 'Analyse des Corrélations', 
         to: '/correlations', 
         icon: 'mdi-chart-scatter-plot' 
-      },
-      { 
-        title: 'Analyses Thermiques', 
-        to: '/temp', 
-        icon: 'mdi-thermometer-alert' 
       },
       { 
         title: 'Bilan Solaire & Hydrique', 
