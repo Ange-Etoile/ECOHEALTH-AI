@@ -23,17 +23,11 @@
             <span class="iconify text-lg" data-icon="solar:map-point-bold-duotone"></span>
             {{ selectedFilters.region || 'National' }}
           </span>
-          <span class="opacity-20">|</span>
-          <span class="flex items-center gap-1">
-            <span class="iconify text-lg" data-icon="solar:city-bold-duotone"></span>
-            {{ selectedFilters.city || 'Toutes localités' }}
-          </span>
         </div>
       </div>
 
       <div class="flex items-center gap-4 bg-surface-light p-2 rounded-2xl border border-outline-variant shadow-sm">
-
-        <div class="hidden sm:block px-4  border-outline-variant">
+        <div class="hidden sm:block px-4 border-outline-variant">
           <p class="text-[9px] font-black opacity-40 uppercase tracking-widest leading-tight">Dernière Sync</p>
           <p class="text-sm font-mono font-bold">{{ lastSyncTime }}</p>
         </div>
@@ -53,7 +47,7 @@
     </header>
 
     <section class="relative">
-      <FilterBar 
+      <SimpleFilterBar 
         v-model="selectedFilters" 
         :options="filterOptions" 
         :loading="loading"
@@ -61,55 +55,78 @@
       />
     </section>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       <KPICard 
-        label="Température Moyenne"
-        :value="stats.temperature"
-        unit="°C"
-        icon="temp" 
-        :status="getTempStatus(stats.temperature)"
-        color="primary"
-      />
-      <KPICard 
-        label="Particules Fines (PM2.5)"
+        label="PM2.5 National"
         :value="stats.pm25"
         unit="µg/m³"
         icon="dust" 
         :status="getAirStatus(stats.pm25)"
         :color="stats.pm25 > 25 ? 'error' : 'success'"
       />
+
       <KPICard 
-        label="Stress Hydrique"
-        :value="stats.secheresse"
-        unit="%"
-        icon="drought" 
-        :status="stats.secheresse > 50 ? 'Critique' : 'Stable'"
+        label="Ville Critique"
+        :value="stats.top_city"
+        unit=""
+        icon="city" 
+        status="Max pollution"
         color="warning"
       />
+
       <KPICard 
-        label="Dynamique Éolienne"
-        :value="stats.vent"
-        unit="km/h"
-        icon="wind" 
-        status="Vitesse de flux"
+        label="Région Max"
+        :value="stats.top_region"
+        unit=""
+        icon="map" 
+        status="Zone à risque"
         color="primary"
+      />
+
+      <KPICard 
+        label="Jour Critique"
+        :value="stats.critical_day"
+        unit=""
+        icon="calendar" 
+        status="Pic historique"
+        color="surface"
+      />
+
+      <KPICard 
+        label="Niveau Alerte"
+        :value="getAirStatus(stats.pm25)"
+        unit=""
+        icon="alert" 
+        :status="stats.pm25 > 35 ? 'Alerte Active' : 'Sous contrôle'"
+        :color="stats.pm25 > 25 ? 'error' : 'warning'"
       />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted} from 'vue'
+import { ref, onMounted } from 'vue'
 import KPICard from '@/components/dashboard/KPICard.vue'
-import FilterBar from '@/components/dashboard/FilterBar.vue'
+import SimpleFilterBar from '@/components/dashboard/SimpleFilterBar.vue'
 import { getDashboardData, getFilterOptions } from '@/services/dataService' 
 
 const loading = ref(false)
 const lastSyncTime = ref('--:--:--')
-const stats = ref({ temperature: 0, pm25: 0, vent: 0, secheresse: 0 })
+
+// Initialisation des stats avec les clés retournées par ton API
+const stats = ref({ 
+  pm25: 0, 
+  top_city: '--',
+  top_region: '--',
+  critical_day: '--',
+  temperature: 0, 
+  vent: 0, 
+  secheresse: 0,
+  precipitation: 0
+})
 
 const filterOptions = ref({ regions: [], citiesData: {}, annees: [] })
-const selectedFilters = ref({ region: null, city: null, year: 2025 })
+const selectedFilters = ref({ region: null, year: 2025 })
 
 const loadAllData = async () => {
   loading.value = true
@@ -120,18 +137,26 @@ const loadAllData = async () => {
   } catch (e) {
     console.error("Erreur de synchronisation", e)
   } finally {
-    // Petit délai pour simuler le calcul IA et rendre l'animation visible
+    // Petit délai pour l'effet visuel
     setTimeout(() => { loading.value = false }, 800)
   }
 }
 
 const loadFilters = async () => {
-  const options = await getFilterOptions()
-  filterOptions.value = options
+  try {
+    const options = await getFilterOptions()
+    filterOptions.value = options
+  } catch (e) {
+    console.error("Erreur chargement filtres", e)
+  }
 }
 
-const getAirStatus = (val: number) => val <= 12 ? 'Qualité Optimale' : val <= 35 ? 'Vigilance' : 'Alerte Sanitaire'
-const getTempStatus = (val: number) => val > 32 ? 'Anomalie Thermique' : 'Stabilité Saisonnière'
+// Logique de statut OMS basée sur le pm25_proxy
+const getAirStatus = (val: number) => {
+  if (val <= 12) return 'Qualité Optimale'
+  if (val <= 35) return 'Vigilance'
+  return 'Alerte Sanitaire'
+}
 
 onMounted(() => {
   loadFilters()
@@ -140,12 +165,10 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* Effet de glassmorphism léger sur le header */
 header {
   background: radial-gradient(circle at top left, rgba(var(--v-theme-primary), 0.03), transparent);
 }
 
-/* Animation personnalisée pour le bouton refresh quand loading */
 :deep(.v-btn--loading .iconify) {
   display: none;
 }

@@ -14,7 +14,7 @@
         </span>
         
         <div class="flex items-baseline flex-wrap gap-1">
-          <span class="text-2xl sm:text-3xl font-black tracking-tighter text-on-surface truncate">
+          <span class="text-2xl sm:text-xl font-black tracking-tighter text-on-surface truncate">
             {{ value }}
           </span>
           <span v-if="unit" class="text-xs font-bold text-on-surface/30 lowercase">
@@ -54,7 +54,7 @@ const props = defineProps<{
   unit?: string
   icon: string
   status: string
-  color?: 'success' | 'warning' | 'error' | 'primary'
+  color?: 'success' | 'warning' | 'error' | 'primary'|'surface'
 }>()
 
 // Dans KPICard.vue
@@ -66,7 +66,11 @@ const weatherIcon = computed(() => {
     'wind': 'wi:strong-wind',
     'drought': 'wi:hot',
     'sun': 'wi:day-sunny',
-    'rain': 'wi:rain'
+    'rain': 'wi:rain',
+    'city': 'solar:city-bold-duotone',
+    'map': 'solar:map-point-wave-bold-duotone',
+    'calendar': 'solar:calendar-date-bold-duotone',
+    'alert': 'solar:danger-triangle-bold-duotone'
   }
   if (props.icon.includes(':')) return props.icon
   return map[props.icon] || 'wi:na'
