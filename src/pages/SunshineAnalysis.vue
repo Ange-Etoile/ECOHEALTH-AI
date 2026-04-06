@@ -6,8 +6,8 @@
         <div class="flex items-center gap-2 text-secondary font-black uppercase tracking-widest text-[10px]">
           <v-icon size="small" color="secondary">mdi-map-marker-radius</v-icon> Surveillance Géospatiale
         </div>
-        <h2 class="text-3xl md:text-5xl font-black tracking-tighter uppercase leading-none">
-          Cartographie des <span class="text-secondary italic text-stroke">Zones à Risque</span>
+        <h2 class="text-xl md:text-5xl font-black tracking-tighter uppercase leading-none">
+          Surveillance <span class="text-secondary italic text-stroke">Spatiale</span>
         </h2>
         <p class="text-[10px] md:text-xs opacity-60 font-bold uppercase tracking-widest mt-1">
           {{ currentZoneName }} — Focus Sanitaire PM2.5
@@ -60,13 +60,13 @@
             </div>
           </v-card>
 
-          <div class="grid grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 gap-4">
             <div class="p-4 rounded-2xl bg-error/10 border border-error/20">
               <span class="text-[9px] font-black uppercase opacity-60 block">Zones Danger</span>
               <span class="text-xl font-black text-error">{{ kpis.danger_cities_count }} <small class="text-[10px]">Villes</small></span>
             </div>
             <div class="p-4 rounded-2xl bg-secondary/10 border border-secondary/20">
-              <span class="text-[9px] font-black uppercase opacity-60 block">Évol. Risque</span>
+              <span class="text-[9px] font-black uppercase opacity-60 block">Évolution du Risque</span>
               <span class="text-xl font-black text-secondary">{{ kpis.risk_trend > 0 ? '+' : '' }}{{ kpis.risk_trend }}%</span>
             </div>
           </div>
@@ -191,9 +191,5 @@ watch(() => theme.global.current.value.dark, renderMap)
 </script>
 
 <style scoped>
-.text-stroke {
-  -webkit-text-stroke: 1px currentColor;
-  color: transparent;
-}
 .text-justify { text-align: justify; }
 </style>

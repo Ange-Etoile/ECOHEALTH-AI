@@ -119,18 +119,13 @@ const menuItems = [
         icon: 'mdi-chart-scatter-plot' 
       },
       { 
-        title: 'Bilan Solaire & Hydrique', 
+        title: 'Surveillance Spatiale', 
         to: '/sunshine-hydric', 
         icon: 'mdi-weather-sunny-alert' 
-      },
-      { 
-        title: 'Profils Régionaux', 
-        to: '/regional-benchmark', 
-        icon: 'mdi-city-variant-outline' 
       }
     ]
   },
-  { title: 'Cartographie',  icon: 'mdi-map-search-outline',      to: '/map' },
+  { title: 'Cartographie Régionaux',  icon: 'mdi-map-search-outline',      to: '/regional-benchmark' },
   { heading: 'INTELLIGENCE' },
   { title: 'IA Santé',      icon: 'mdi-brain-outline',           to: '/health' },
   { title: 'Alertes Pollution', icon: 'mdi-alert-circle-outline', to: '/alerts', badge: 3 },
@@ -138,7 +133,6 @@ const menuItems = [
   { title: 'À Propos',      icon: 'mdi-account-group-outline',   to: '/about' },
   { heading: 'SYSTÈME' },
   { title: 'Documentation',     icon: 'mdi-file-document-outline',   to: '/documentation' },
-  { title: 'Paramètres',    icon: 'mdi-cog-outline',             to: '/settings' },
 ]
 
 const handleNavClick = () => {

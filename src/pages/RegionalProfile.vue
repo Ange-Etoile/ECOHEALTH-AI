@@ -7,8 +7,8 @@
           <v-chip color="primary" size="x-small" variant="flat" class="font-black uppercase px-2 italic">Analyse</v-chip>
           <span class="text-[10px] opacity-60 font-bold uppercase tracking-widest text-primary">Étude Comparative Inter-Régionale</span>
         </div>
-        <h2 class="text-2xl md:text-4xl font-black tracking-tighter uppercase italic leading-none">
-          Benchmark <span class="text-primary">National</span>
+        <h2 class="text-xl md:text-4xl font-black tracking-tighter uppercase italic leading-none">
+          Cartographie <span class="text-primary">National</span>
         </h2>
       </div>
       
