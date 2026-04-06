@@ -114,18 +114,25 @@ const menuItems = [
         icon: 'mdi-sync' 
       },
       { 
-        title: 'Analyse des Corrélations', 
+        title: 'Surveillance Spatiale', 
+        to: '/map', 
+        icon: 'mdi-map-marker-radius' 
+      },
+      { 
+        title: 'Analyse Climatique', 
         to: '/correlations', 
         icon: 'mdi-chart-scatter-plot' 
       },
       { 
-        title: 'Surveillance Spatiale', 
+        title: 'Bilan Hydrique', 
         to: '/sunshine-hydric', 
         icon: 'mdi-weather-sunny-alert' 
       }
     ]
   },
   { title: 'Cartographie Régionaux',  icon: 'mdi-map-search-outline',      to: '/regional-benchmark' },
+  { heading: 'MODELS' },
+  { title: 'Performance IA', to: '/performance-ia', icon: 'mdi-brain' },
   { heading: 'INTELLIGENCE' },
   { title: 'IA Santé',      icon: 'mdi-brain-outline',           to: '/health' },
   { title: 'Alertes Pollution', icon: 'mdi-alert-circle-outline', to: '/alerts', badge: 3 },

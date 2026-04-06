@@ -19,39 +19,33 @@ const routes = [
       {
         path: 'map', 
         name: 'Cartographie',
-        component: () => import('@/pages/Map.vue')
+        component: () => import('@/pages/Map.vue') 
       },
       {
-        path: 'health', 
-        name: 'IA Santé',
-        component: () => import('@/pages/HealthAI.vue')
+        path: 'performance-ia', 
+        name: 'PerformanceIA',
+        component: () => import('@/pages/PerformanceIA.vue') 
       },
       { 
-      path: 'temp', 
-      name: 'Analyses Thermiques',
-      component: () => import('@/pages/ThermalAnalysis.vue'),
-      },
-      { 
-      path: 'correlations', 
-      name: 'Correlations',
-      component: () => import('@/pages/CorrelationsView.vue'),
+        path: 'correlations', 
+        name: 'Correlations',
+        component: () => import('@/pages/CorrelationsView.vue'),
       },
       { 
         path: 'sunshine-hydric', 
         name: 'SunshineHydric',
         component: () => import('@/pages/SunshineAnalysis.vue'), 
       },
-      { 
-        path: 'regional-benchmark', 
-        name: 'RegionalBenchmark',
-        component: () => import('@/pages/RegionalProfile.vue'), 
+      {
+        path: 'health', 
+        name: 'IASante',
+        component: () => import('@/pages/HealthAI.vue')
       },
       {
         path: 'alerts', 
         name: 'Alertes',
         component: () => import('@/pages/Alerts.vue')
       },
-      // Nouvelle route pour la page À Propos
       {
         path: 'about', 
         name: 'About',
@@ -61,13 +55,7 @@ const routes = [
         path: 'documentation', 
         name: 'Documentation',
         component: () => import('@/pages/Documentation.vue')
-      },
-      // // Optionnel : Route pour les paramètres
-      // {
-      //   path: 'settings', 
-      //   name: 'Settings',
-      //   component: () => import('@/pages/Settings.vue')
-      // }
+      }
     ]
   }
 ]

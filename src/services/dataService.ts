@@ -40,3 +40,7 @@ export const getCyclesAnalysis = async (filters: any) => {
   const response = await api.get('/api/analysis/cycles', { params: filters });
   return response.data;
 };
+export const getMLPerformance = async () => {
+  const response = await api.get('/api/ml-performance');
+  return response.data;
+};
