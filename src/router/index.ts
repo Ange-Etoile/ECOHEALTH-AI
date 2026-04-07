@@ -66,7 +66,6 @@ const routes = [
         name: 'Predictions2026',
         component: () => import('@/pages/PredictionsGeneral.vue')
       },
-      ,
       {
         path: 'future-projections', 
         name: 'FutureProjections',
