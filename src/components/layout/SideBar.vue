@@ -130,7 +130,13 @@ const menuItems = [
   { title: 'Performance IA', to: '/performance-ia', icon: 'mdi-brain' },
   { heading: 'INTELLIGENCE' },
   { title: 'Prévisions 2026', icon: 'mdi-crystal-ball', to: '/predictions-2026' },
-  { title: 'Alertes Pollution', icon: 'mdi-alert-circle-outline', to: '/alerts', badge: 3 },
+  { 
+  title: 'Prévisions Futures', 
+  icon: 'mdi-crystal-ball', 
+  to: '/future-projections', 
+  badge: 'NEW', 
+  color: 'secondary' 
+  },
   { heading: 'L\'ÉQUIPE' }, 
   { title: 'À Propos',      icon: 'mdi-account-group-outline',   to: '/about' },
   { heading: 'SYSTÈME' },

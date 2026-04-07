@@ -65,6 +65,12 @@ const routes = [
         path: 'predictions-2026', 
         name: 'Predictions2026',
         component: () => import('@/pages/PredictionsGeneral.vue')
+      },
+      ,
+      {
+        path: 'future-projections', 
+        name: 'FutureProjections',
+        component: () => import('@/pages/FuturePrediction.vue') 
       }
     ]
   }
