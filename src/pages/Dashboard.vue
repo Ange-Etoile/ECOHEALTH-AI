@@ -10,7 +10,7 @@
           EcoHealth <span class="text-primary italic">AI</span>
         </h2>
         <p class="text-[10px] md:text-xs opacity-50 font-bold uppercase tracking-widest mt-2">
-          Analyse Qualité de l'Air — {{ selectedFilters.region || 'Vue Nationale' }} ({{ selectedFilters.year }})
+          Analyse Qualité de l'Air — {{ selectedFilters.city || selectedFilters.region || 'Vue Nationale' }} ({{ selectedFilters.year }})
         </p>
       </div>
       
@@ -27,7 +27,7 @@
     </header>
 
     <v-card variant="outlined" class="bg-surface p-3 md:p-4 rounded-3xl border-outline-variant shadow-sm">
-      <SimpleFilterBar 
+      <FilterBar 
         v-model="selectedFilters" 
         :options="filterOptions" 
         :loading="loading" 
@@ -63,21 +63,24 @@
         </ChartCard>
       </div>
 
-      <div class="max-h-[400px] col-span-12 lg:col-span-4">
+      <div class="max-h-auto col-span-12 lg:col-span-4">
         <v-card class="rounded-[24px] border border-outline-variant p-5 h-full shadow-none bg-surface-light">
-          <h3 class="text-[10px] font-black uppercase tracking-[0.2em] opacity-40 mb-6 flex items-center gap-2">Classement Régional</h3>
+          <h3 class="text-[10px] font-black uppercase tracking-[0.2em] opacity-40 mb-6 flex items-center gap-2">
+            {{ selectedFilters.region ? 'Classement des Villes' : 'Classement Régional' }}
+          </h3>
+          
           <div class="space-y-3">
-            <div v-for="(reg, index) in chartData.regions" :key="reg.name" 
+            <div v-for="(item, index) in (selectedFilters.region ? chartData.cities : chartData.regions)" :key="item.name" 
                  class="group relative overflow-hidden bg-surface border border-outline-variant p-4 rounded-xl flex items-center justify-between transition-all hover:translate-x-1">
               <div class="z-10">
                 <span class="text-[8px] font-black opacity-30 block uppercase">Rang #{{ index + 1 }}</span>
-                <p class="font-black text-xs uppercase tracking-tight">{{ reg.name }}</p>
+                <p class="font-black text-xs uppercase tracking-tight">{{ item.name }}</p>
               </div>
               <div class="text-right z-10">
-                <p class="text-base font-black tabular-nums">{{ reg.value }} <span class="text-[8px] opacity-40">µg</span></p>
-                <span :class="reg.value > 40 ? 'text-rose-500' : 'text-emerald-500'" class="text-[9px] font-black uppercase">±{{ reg.variation }}%</span>
+                <p class="text-base font-black tabular-nums">{{ item.value }} <span class="text-[8px] opacity-40">µg</span></p>
+                <span :class="item.value > 40 ? 'text-rose-500' : 'text-emerald-500'" class="text-[9px] font-black uppercase">±{{ item.variation }}%</span>
               </div>
-              <div class="absolute bottom-0 left-0 h-[2px] bg-primary opacity-20" :style="{ width: Math.min(reg.value, 100) + '%' }"></div>
+              <div class="absolute bottom-0 left-0 h-[2px] bg-primary opacity-20" :style="{ width: Math.min(item.value, 100) + '%' }"></div>
             </div>
           </div>
         </v-card>
@@ -96,7 +99,7 @@ import { ref, onMounted, nextTick, onUnmounted } from 'vue'
 import Plotly from 'plotly.js-dist-min'
 import KpiBox from '@/components/dashboard/KpiBox.vue'
 import ChartCard from '@/components/dashboard/ChartCard.vue'
-import SimpleFilterBar from '@/components/dashboard/SimpleFilterBar.vue'
+import FilterBar from '@/components/dashboard/FilterBar.vue' // Importé FilterBar au lieu de SimpleFilterBar
 import { getDashboardData, getFilterOptions } from '@/services/dataService'
 
 const loading = ref(false)
@@ -106,10 +109,11 @@ const chartData = ref({
   evolution: { months: [], pm25: [], temp: [] }, 
   precip: { months: [], pm25: [], pre_cul: [] }, 
   regions: [],
+  cities: [], // Ajout du support pour les villes
   distribution: { x: [], y: [] }
 })
-const filterOptions = ref({ regions: [], annees: [] })
-const selectedFilters = ref({ region: null, year: 2025 })
+const filterOptions = ref({ regions: [], cities: [], annees: [] })
+const selectedFilters = ref({ region: null, city: null, year: 2025 })
 
 const getColor = (v) => v > 50 ? '#f43f5e' : (v > 25 ? '#fbbf24' : '#10b981');
 
@@ -137,7 +141,7 @@ const drawPlots = () => {
     }
   ], { ...commonLayout, yaxis2: { overlaying: 'y', side: 'right', showgrid: false } }, { responsive: true, displayModeBar: false })
 
-  // 2. Violin Plot (Nouveau)
+  // 2. Violin Plot
   Plotly.react('violinPlot', [
     {
       type: 'violin',
@@ -211,3 +215,14 @@ onMounted(async () => {
 
 onUnmounted(() => window.removeEventListener('resize', () => {}))
 </script>
+
+<style scoped>
+:deep(.main-svg) { background: transparent !important; }
+:deep(.js-plotly-plot .plotly .modebar) { display: none !important; }
+.chart-skel {
+  border-radius: 16px;
+  background: rgba(150, 150, 150, 0.1);
+  animation: pulse 1.5s infinite;
+}
+@keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 0.8; } }
+</style>
