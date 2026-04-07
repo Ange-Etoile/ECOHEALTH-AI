@@ -2,8 +2,11 @@
   <div class="max-w-7xl mx-auto space-y-8 p-4 md:p-6 text-on-surface">
     <header class="flex flex-col sm:flex-row sm:items-center justify-between gap-6 border-b border-outline-variant pb-6">
       <div class="space-y-1">
-        <h2 class="text-3xl md:text-4xl font-black tracking-tighter uppercase leading-none">
-          Analyses des <span class="text-secondary italic">Corrélations</span>
+        <div class="flex items-center gap-2 text-secondary font-black uppercase tracking-[0.2em] text-[10px]">
+          <v-icon size="x-small">mdi-shield-check-outline</v-icon> Analyse de Corrélation IndabaX
+        </div>
+        <h2 class="text-3xl md:text-5xl font-black tracking-tighter uppercase leading-none">
+          Analyses <span class="text-secondary italic">Climatiques</span>
         </h2>
         <p class="text-[10px] md:text-xs opacity-50 font-bold uppercase tracking-widest mt-2">
           Interactions Multi-variées — {{ selectedFilters.city || selectedFilters.region || 'Vue Nationale' }} ({{ selectedFilters.year }})
@@ -11,9 +14,14 @@
       </div>
       
       <div class="flex items-center gap-4">
-        <v-btn @click="loadAnalysis" :loading="loading" prepend-icon="mdi-database-refresh" color="secondary" variant="elevated" class="rounded-xl font-bold text-xs">
-          Actualiser les données
-        </v-btn>
+        <v-btn 
+          @click="loadAnalysis" 
+          :loading="loading" 
+          icon="mdi-refresh" 
+          color="secondary" 
+          variant="tonal" 
+          class="rounded-xl shadow-sm"
+        ></v-btn>
       </div>
     </header>
 
@@ -25,11 +33,11 @@
       <v-col cols="12" lg="6">
         <v-card variant="outlined" class="rounded-3xl border-outline-variant bg-surface h-full overflow-hidden shadow-sm">
           <div class="p-4 border-b border-outline-variant bg-surface-variant/10 flex justify-between items-center">
-            <span class="text-[10px] font-black uppercase tracking-widest">Matrice de Pearson (Interactions)</span>
-            <v-chip size="x-small" color="secondary" variant="flat">DYNAMIQUE</v-chip>
+            <span class="text-[10px] font-black uppercase tracking-widest text-primary">Évolution Thermique (Réelle vs Apparente)</span>
+            <v-icon size="small" color="primary">mdi-chart-line</v-icon>
           </div>
           <div class="relative w-full h-[350px] md:h-[450px]">
-            <div id="heatmapChart" class="absolute inset-0"></div>
+            <div id="tempComparisonChart" class="absolute inset-0"></div>
           </div>
         </v-card>
       </v-col>
@@ -38,74 +46,88 @@
         <v-card variant="outlined" class="rounded-3xl border-outline-variant bg-surface h-full overflow-hidden shadow-sm">
           <div class="p-4 border-b border-outline-variant bg-surface-variant/10 flex justify-between items-center">
             <div class="flex items-center gap-2">
-              <span class="text-[10px] font-black uppercase tracking-widest">Focus Variable :</span>
+              <span class="text-[10px] font-black uppercase tracking-widest">Facteur d'influence :</span>
               <v-select
                 v-model="activeFactor"
                 :items="factors"
                 density="compact"
                 hide-details
                 variant="plain"
-                class="max-w-auto text-[10px] font-light"
+                class="max-w-[200px] text-[10px] font-bold uppercase"
                 @update:modelValue="updateCharts"
               ></v-select>
             </div>
             <v-icon size="small" color="secondary">mdi-chart-scatter-plot</v-icon>
           </div>
-          <div class="relative w-full h-[350px] md:h-[450px]">
+          <div class="relative w-full h-[350px] md:h-[400px]">
             <div id="scatterChart" class="absolute inset-0"></div>
+          </div>
+          <div class="p-4 bg-secondary/5 border-t border-outline-variant text-[10px] italic opacity-70">
+            <strong>Observation Scatter Plot :</strong> La densité des points montre comment la <strong>PM2.5</strong> réagit aux variations de <strong>{{ currentFactorLabel }}</strong>.
           </div>
         </v-card>
       </v-col>
     </v-row>
 
-    <v-card variant="outlined" class="rounded-3xl p-6 md:p-8 border-outline-variant bg-surface shadow-sm mt-6">
-      <div class="flex items-center gap-3 mb-8 border-b border-outline-variant pb-4">
-        <v-avatar color="secondary" variant="tonal" size="32">
-          <v-icon size="18">mdi-brain</v-icon>
+    <v-card variant="outlined" class="rounded-[2rem] p-6 md:p-10 border-outline-variant bg-surface shadow-md mt-6">
+      <div class="flex items-center gap-3 mb-8 border-b border-outline-variant pb-6">
+        <v-avatar color="secondary" variant="tonal" size="48">
+          <v-icon size="24">mdi-brain</v-icon>
         </v-avatar>
-        <h3 class="text-sm font-black uppercase tracking-widest">Interprétation du Modèle Environnemental</h3>
+        <div>
+          <h3 class="text-lg font-black uppercase tracking-tighter">Diagnostic temporel</h3>
+          <p class="text-[10px] opacity-60 font-bold uppercase tracking-widest">Analyse croisée des variables environnementales</p>
+        </div>
       </div>
       
-      <div v-if="analysisData.length > 0" class="grid grid-cols-1 lg:grid-cols-5 gap-6">
-        
-        <div class="lg:col-span-3 space-y-4 text-sm leading-relaxed text-justify">
-          <div class="flex items-center gap-2 text-secondary font-bold text-[10px] uppercase tracking-wider">
-            <v-icon size="small">mdi-text-search</v-icon> Analyse du comportement des polluants
+      <div v-if="analysisData.length > 0" class="grid grid-cols-1 lg:grid-cols-5 gap-10">
+        <div class="lg:col-span-3 space-y-6">
+          <div class="bg-surface-variant/5 p-6 rounded-[1.5rem] border border-outline-variant/50 relative overflow-hidden">
+            <v-icon class="absolute -right-4 -bottom-4 opacity-5 text-8xl">mdi-format-quote-close</v-icon>
+            <div class="text-sm md:text-base leading-relaxed text-justify" v-html="generateDetailedInterpretation"></div>
           </div>
-          <div class="bg-surface-variant/5 p-5 rounded-2xl border border-outline-variant/50">
-             <p v-html="generateObservation"></p>
-          </div>
-        </div>
 
-        <div class="lg:col-span-2 grid grid-cols-2 gap-3">
-          <div class="p-4 rounded-2xl border border-outline-variant bg-surface-variant/5">
-            <span class="text-[9px] font-bold uppercase opacity-60 block text-blue-darken-2">Précipitations</span>
-            <span class="text-xl font-black">{{ avgRain }} <small class="text-[10px]">mm</small></span>
-          </div>
-          <div class="p-4 rounded-2xl border border-outline-variant bg-surface-variant/5">
-            <span class="text-[9px] font-bold uppercase opacity-60 block text-orange-darken-2">Solaire</span>
-            <span class="text-xl font-black">{{ avgRad }} <small class="text-[10px]">W/m²</small></span>
-          </div>
-          <div class="p-4 rounded-2xl border border-outline-variant bg-surface-variant/5">
-            <span class="text-[9px] font-bold uppercase opacity-60 block text-green-darken-2">Vitesse Vent</span>
-            <span class="text-xl font-black">{{ avgWind }} <small class="text-[10px]">km/h</small></span>
-          </div>
-          <div class="p-4 rounded-2xl border border-outline-variant bg-surface-variant/5">
-            <span class="text-[9px] font-bold uppercase opacity-60 block text-red-lighten-1">Température</span>
-            <span class="text-xl font-black">{{ avgTemp }} <small class="text-[10px]">°C</small></span>
-          </div>
-          <div class="p-4 rounded-2xl border border-outline-variant bg-surface-variant/10 col-span-2 flex justify-between items-center">
-            <div>
-              <span class="text-[9px] font-bold uppercase opacity-60 block">Niveau Moyen PM2.5</span>
-              <div class="text-2xl font-black text-secondary">{{ avgPM25 }} <small class="text-[10px]">µg/m³</small></div>
+          <v-alert :color="airStatus.color" variant="tonal" class="rounded-2xl border-none p-4">
+            <div class="flex items-center gap-4">
+               <v-chip :color="airStatus.color" class="font-black uppercase text-xs">{{ airStatus.level }}</v-chip>
+               <div>
+                 <div class="font-black uppercase text-[10px] tracking-widest">Statut : {{ airStatus.status }}</div>
+                 <div class="text-[11px] opacity-80 leading-tight">{{ airStatus.action }}</div>
+               </div>
             </div>
-            <v-chip :color="pmStatusColor" size="small" class="font-black uppercase text-[10px]">{{ pmStatusText }}</v-chip>
-          </div>
+          </v-alert>
         </div>
 
+        <div class="lg:col-span-2 grid grid-cols-2 gap-4">
+          <div class="p-5 rounded-2xl border border-outline-variant bg-surface-variant/5 hover:border-secondary transition-colors">
+            <span class="text-[10px] font-bold uppercase opacity-60 block text-blue">Précipitations</span>
+            <span class="text-2xl font-black">{{ avgRain }} <small class="text-xs">mm</small></span>
+          </div>
+          <div class="p-5 rounded-2xl border border-outline-variant bg-surface-variant/5 hover:border-secondary transition-colors">
+            <span class="text-[10px] font-bold uppercase opacity-60 block text-orange">Solaire</span>
+            <span class="text-2xl font-black">{{ avgRad }} <small class="text-xs">W/m²</small></span>
+          </div>
+          <div class="p-5 rounded-2xl border border-outline-variant bg-surface-variant/5 hover:border-secondary transition-colors">
+            <span class="text-[10px] font-bold uppercase opacity-60 block text-green">Vitesse Vent</span>
+            <span class="text-2xl font-black">{{ avgWind }} <small class="text-xs">km/h</small></span>
+          </div>
+          <div class="p-5 rounded-2xl border border-outline-variant bg-surface-variant/5 hover:border-secondary transition-colors">
+            <span class="text-[10px] font-bold uppercase opacity-60 block text-red">Température</span>
+            <span class="text-2xl font-black">{{ avgTemp }} <small class="text-xs">°C</small></span>
+          </div>
+          
+          <v-card color="primary" variant="flat" class="col-span-2 p-6 rounded-2xl flex justify-between items-center">
+            <div>
+              <span class="text-[10px] font-black uppercase opacity-80 block">Indice Moyen PM2.5</span>
+              <div class="text-3xl font-black">{{ avgPM25 }} <small class="text-sm">µg/m³</small></div>
+            </div>
+          </v-card>
+        </div>
       </div>
-      <div v-else class="flex justify-center py-10">
-        <v-progress-circular indeterminate color="secondary"></v-progress-circular>
+      
+      <div v-else class="flex flex-col items-center justify-center py-20 gap-4 opacity-50">
+        <v-progress-circular indeterminate color="secondary" size="64"></v-progress-circular>
+        <span class="text-[10px] font-black uppercase tracking-widest">Chargement du moteur d'analyse...</span>
       </div>
     </v-card>
   </div>
@@ -132,124 +154,113 @@ const factors = [
   { title: 'Température', value: 'temperature_2m_mean' }
 ]
 
-// --- MATHS : CORRÉLATION ---
-const getPearsonCorrelation = (x, y) => {
-  const n = x.length; if (n < 2) return 0;
-  const muX = x.reduce((a, b) => a + b, 0) / n;
-  const muY = y.reduce((a, b) => a + b, 0) / n;
-  const num = x.reduce((acc, val, i) => acc + (val - muX) * (y[i] - muY), 0);
-  const den = Math.sqrt(x.reduce((acc, val) => acc + Math.pow(val - muX, 2), 0) * y.reduce((acc, val) => acc + Math.pow(val - muY, 2), 0));
-  return den === 0 ? 0 : num / den;
-}
+const currentFactorLabel = computed(() => factors.find(f => f.value === activeFactor.value)?.title)
 
-// --- CALCULS MOYENNES ---
-const avgPM25 = computed(() => analysisData.value.length ? (analysisData.value.reduce((acc, d) => acc + d.pm25_proxy, 0) / analysisData.value.length).toFixed(2) : 0)
+// --- STATS & MOYENNES ---
+const avgPM25 = computed(() => analysisData.value.length ? analysisData.value[0].avg_pm25_local.toFixed(2) : 0)
+const avgPM25National = computed(() => analysisData.value.length ? analysisData.value[0].avg_pm25_national.toFixed(2) : 0)
+const diffNational = computed(() => (parseFloat(avgPM25.value) - parseFloat(avgPM25National.value)).toFixed(2))
+
 const avgRain = computed(() => analysisData.value.length ? (analysisData.value.reduce((acc, d) => acc + d.precipitation_sum, 0) / analysisData.value.length).toFixed(1) : 0)
 const avgWind = computed(() => analysisData.value.length ? (analysisData.value.reduce((acc, d) => acc + d.wind_speed_10m_max, 0) / analysisData.value.length).toFixed(1) : 0)
 const avgRad = computed(() => analysisData.value.length ? (analysisData.value.reduce((acc, d) => acc + d.shortwave_radiation_sum, 0) / analysisData.value.length).toFixed(0) : 0)
 const avgTemp = computed(() => analysisData.value.length ? (analysisData.value.reduce((acc, d) => acc + d.temperature_2m_mean, 0) / analysisData.value.length).toFixed(1) : 0)
 
-const pmStatusColor = computed(() => parseFloat(avgPM25.value) < 25 ? 'success' : 'error')
-const pmStatusText = computed(() => parseFloat(avgPM25.value) < 25 ? 'Air Sain' : 'Air Pollué')
+// --- SYSTÈME DE STATUT SANITAIRE (4 COULEURS) ---
+const airStatus = computed(() => {
+  const pm = parseFloat(avgPM25.value)
+  if (pm <= 12) return { level: "Vert", color: "success", status: "Air Sain", action: "Qualité excellente. Aucune menace pour la santé publique." }
+  if (pm <= 35) return { level: "Jaune", color: "warning", status: "Modéré", action: "Vigilance recommandée pour les personnes asthmatiques ou fragiles." }
+  if (pm <= 55) return { level: "Orange", color: "orange-darken-2", status: "Alerte Pollution", action: "Qualité dégradée. Évitez les activités physiques intenses en extérieur." }
+  return { level: "Rouge", color: "error", status: "Urgence Sanitaire", action: "Danger immédiat. Port du masque conseillé et limitation stricte des sorties." }
+})
 
-// --- LOGIQUE D'INTERPRÉTATION AVANCÉE ---
-const generateObservation = computed(() => {
+// --- INTERPRÉTATION DYNAMIQUE RICHE ---
+const generateDetailedInterpretation = computed(() => {
   if (!analysisData.value.length) return ""
   
   const zone = selectedFilters.value.city || selectedFilters.value.region || 'nationale'
   const pm = parseFloat(avgPM25.value)
+  const rad = parseFloat(avgRad.value)
   const rain = parseFloat(avgRain.value)
   const wind = parseFloat(avgWind.value)
-  const rad = parseFloat(avgRad.value)
 
-  const corrSolaire = getPearsonCorrelation(analysisData.value.map(d => d.shortwave_radiation_sum), analysisData.value.map(d => d.pm25_proxy))
-  const corrVent = getPearsonCorrelation(analysisData.value.map(d => d.wind_speed_10m_max), analysisData.value.map(d => d.pm25_proxy))
-  const corrPluie = getPearsonCorrelation(analysisData.value.map(d => d.precipitation_sum), analysisData.value.map(d => d.pm25_proxy))
+  let report = `Le diagnostic pour <strong>${zone}</strong> révèle un indice moyen de <strong>${pm} µg/m³</strong>. <br><br>`
 
-  let intro = `L'analyse des données pour <strong>${zone}</strong> révèle un écosystème où la qualité de l'air (PM2.5) est étroitement liée aux conditions météo. <br><br>`
-  
-  let solarDetail = ""
-  if (corrSolaire > 0.3) {
-    solarDetail = `Le <strong>rayonnement solaire</strong> (${rad} W/m²) présente une corrélation positive forte (${corrSolaire.toFixed(2)}). Cela indique que le soleil favorise des réactions photochimiques augmentant la concentration des particules fines.`
+  // Analyse Solaire
+  if (rad > 400) {
+    report += `<strong>Impact Solaire :</strong> Le fort ensoleillement actuel (${rad} W/m²) accélère les réactions chimiques atmosphériques, augmentant potentiellement la production de polluants secondaires. <br>`
   } else {
-    solarDetail = `L'impact du rayonnement solaire semble modéré sur cette période, ne constituant pas le facteur principal de pollution.`
+    report += `<strong>Impact Solaire :</strong> Le rayonnement est modéré, limitant l'effet de serre localisé. <br>`
   }
 
-  let cleanEffect = ""
-  if (rain > 10 || corrPluie < -0.2) {
-    cleanEffect = `Les <strong>précipitations</strong> (${rain} mm) jouent un rôle de "lessivage" efficace, aidant à rabattre les particules au sol et à assainir l'air.`
+  // Analyse Pluie
+  if (rain > 5) {
+    report += `<strong>Lessivage :</strong> Les précipitations (${rain} mm) agissent comme un purificateur naturel, capturant les micro-particules au sol. <br>`
   } else {
-    cleanEffect = `La faible pluviométrie limite le nettoyage naturel de l'atmosphère, favorisant la stagnation des polluants.`
+    report += `<strong>Sècheresse :</strong> L'absence de pluie favorise la mise en suspension des poussières et leur stagnation. <br>`
   }
 
-  let windEffect = ""
-  if (wind > 15 || corrVent < -0.3) {
-    windEffect = `Le <strong>vent</strong> (${wind} km/h) agit comme un moteur de dispersion. Sa corrélation négative montre qu'une augmentation de la vitesse du vent réduit significativement la densité de PM2.5.`
+  // Analyse Vent
+  if (wind < 10) {
+    report += `<strong>Dispersion :</strong> La faiblesse du vent (${wind} km/h) crée une "cloche" de pollution, empêchant l'air de se renouveler.`
   } else {
-    windEffect = `La faiblesse des courants aériens (${wind} km/h) crée un phénomène de confinement, empêchant l'évacuation des micro-particules.`
+    report += `<strong>Dispersion :</strong> Le vent soutenu (${wind} km/h) favorise une évacuation rapide des masses d'air polluées.`
   }
 
-  // --- SEUILS SELON LES DIRECTIVES DE L'OMS ---
-  let statusDetail = ""
-  if (pm <= 15) {
-    statusDetail = `<br><br><span class="text-success font-bold">Qualité Excellente :</span> Avec une moyenne de ${pm} µg/m³, l'air respecte l'objectif de santé publique de l'<strong>OMS</strong> (≤ 15 µg/m³).`
-  } else if (pm <= 25) {
-    statusDetail = `<br><br><span class="text-warning font-bold">Qualité Modérée :</span> Le niveau dépasse l'objectif idéal mais reste sous le seuil critique de pollution de 25 µg/m³.`
-  } else {
-    statusDetail = `<br><br><span class="text-error font-bold">Alerte Pollution :</span> La concentration dépasse le seuil de <strong>25 µg/m³</strong> fixé par les normes internationales de l'OMS.`
-  }
-
-  return `${intro} 1. ${solarDetail} <br> 2. ${cleanEffect} <br> 3. ${windEffect} ${statusDetail}`
+  return report
 })
 
+// --- GRAPHES ---
 const updateCharts = () => {
   if (!analysisData.value.length) return
   const isDark = theme.global.current.value.dark
   const textColor = isDark ? '#FFFFFF' : '#424242'
   const gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)'
 
-  setTimeout(() => {
-    nextTick(() => {
-      renderDynamicHeatmap(textColor)
-      renderScatter(textColor, gridColor)
-    })
-  }, 50)
+  nextTick(() => {
+    renderTempLineChart(textColor, gridColor)
+    renderScatterChart(textColor, gridColor)
+  })
 }
 
-const renderDynamicHeatmap = (textColor) => {
-  const keys = ['temperature_2m_mean', 'shortwave_radiation_sum', 'precipitation_sum', 'pm25_proxy', 'wind_speed_10m_max']
-  const labels = ['Temp', 'Solaire', 'Pluie', 'PM2.5', 'Vent']
-  const zValues = keys.map(key1 => 
-    keys.map(key2 => getPearsonCorrelation(analysisData.value.map(d => d[key1]), analysisData.value.map(d => d[key2])))
-  )
-
-  Plotly.react('heatmapChart', [{
-    z: zValues, x: labels, y: labels, type: 'heatmap',
-    colorscale: [[0, '#3F51B5'], [0.5, '#F5F5F5'], [1, '#F44336']],
-    zmin: -1, zmax: 1
-  }], {
+const renderTempLineChart = (textColor, gridColor) => {
+  const traces = [
+    {
+      y: analysisData.value.map(d => d.temperature_2m_mean),
+      name: 'Réelle', type: 'scatter', mode: 'lines',
+      line: { color: '#fbbf24', width: 2.5 }
+    },
+    {
+      y: analysisData.value.map(d => d.apparent_temperature_mean),
+      name: 'Apparente', type: 'scatter', mode: 'lines',
+      line: { color: '#f43f5e', width: 2, dash: 'dot' }
+    }
+  ]
+  Plotly.react('tempComparisonChart', traces, {
     paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
-    margin: { t: 10, b: 40, l: 50, r: 10 }, font: { color: textColor, size: 9 }
+    margin: { t: 40, b: 60, l: 50, r: 20 }, font: { color: textColor, size: 9 },
+    legend: { orientation: 'h', y: -0.2 },
+    xaxis: { showticklabels: false, gridcolor: gridColor },
+    yaxis: { title: 'Température (°C)', gridcolor: gridColor }
   }, { responsive: true, displayModeBar: false })
 }
 
-const renderScatter = (textColor, gridColor) => {
-  const factor = factors.find(f => f.value === activeFactor.value)
+const renderScatterChart = (textColor, gridColor) => {
   Plotly.react('scatterChart', [{
     x: analysisData.value.map(d => d[activeFactor.value]),
     y: analysisData.value.map(d => d.pm25_proxy),
     mode: 'markers', type: 'scattergl',
-    marker: { size: 6, color: '#FF5252', opacity: 0.4, line: { width: 0.5, color: textColor } }
+    marker: { size: 5, color: '#3b82f6', opacity: 0.6 }
   }], {
     paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
     margin: { t: 30, b: 50, l: 50, r: 20 }, font: { color: textColor, size: 10 },
-    xaxis: { title: factor.title, gridcolor: gridColor },
+    xaxis: { title: currentFactorLabel.value, gridcolor: gridColor },
     yaxis: { title: 'PM2.5 (µg/m³)', gridcolor: gridColor }
   }, { responsive: true, displayModeBar: false })
 }
 
 const loadAnalysis = async () => {
-  if (loading.value) return 
   loading.value = true
   try {
     const data = await getAnalysisData(selectedFilters.value)
@@ -258,18 +269,16 @@ const loadAnalysis = async () => {
   } finally { loading.value = false }
 }
 
-watch(() => theme.global.current.value.dark, () => updateCharts())
+watch(() => theme.global.current.value.dark, updateCharts)
+
 onMounted(async () => {
   filterOptions.value = await getFilterOptions()
   loadAnalysis()
-  window.addEventListener('resize', () => {
-    ['heatmapChart', 'scatterChart'].forEach(id => {
-      const el = document.getElementById(id); if (el) Plotly.Plots.resize(el)
-    })
-  })
+  window.addEventListener('resize', updateCharts)
 })
 </script>
 
 <style scoped>
 .text-justify { text-align: justify; }
+.text-stroke { -webkit-text-stroke: 1px currentColor; color: transparent; }
 </style>

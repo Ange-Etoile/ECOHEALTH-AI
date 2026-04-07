@@ -115,18 +115,13 @@ const menuItems = [
       },
       { 
         title: 'Surveillance Spatiale', 
-        to: '/map', 
+        to: '/sunshine-hydric', 
         icon: 'mdi-map-marker-radius' 
       },
       { 
         title: 'Analyse Climatique', 
         to: '/correlations', 
         icon: 'mdi-chart-scatter-plot' 
-      },
-      { 
-        title: 'Bilan Hydrique', 
-        to: '/sunshine-hydric', 
-        icon: 'mdi-weather-sunny-alert' 
       }
     ]
   },

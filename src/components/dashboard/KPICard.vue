@@ -1,12 +1,12 @@
 <template>
   <v-card 
     variant="flat" 
-    class="kpi-card relative overflow-hidden rounded-[24px] border border-on-surface/5 p-4 sm:p-5 transition-all duration-300 hover:translate-y-[-4px] h-full flex flex-col justify-between"
+    class="kpi-card relative overflow-hidden rounded-[20px] border border-on-surface/5 p-4 sm:p-5 transition-all duration-300 hover:translate-y-[-4px] h-full flex flex-col justify-between"
     :style="{ background: 'linear-gradient(135deg, rgba(var(--v-theme-surface), 0.9) 0%, rgba(var(--v-theme-surface), 0.4) 100%)' }"
   >
     <div class="absolute -right-4 -top-4 w-24 h-24 rounded-full bg-primary/10 blur-2xl pointer-events-none"></div>
 
-    <div class="flex items-start justify-between gap-4 relative z-10 w-full">
+    <div class="flex items-start justify-between gap-2 relative z-10 w-full">
       
       <div class="flex flex-col flex-1 min-w-0">
         <span class="text-[10px] font-black uppercase tracking-[0.15em] text-on-surface/40 leading-tight mb-2 break-words">
@@ -14,7 +14,7 @@
         </span>
         
         <div class="flex items-baseline flex-wrap gap-1">
-          <span class="text-xl sm:text-xl font-black tracking-tighter text-on-surface">
+          <span class="text-xl sm:text-sm font-black tracking-tighter text-on-surface">
             {{ value }}
           </span>
           <span v-if="unit" class="text-xs font-bold text-on-surface/30 lowercase">
@@ -23,16 +23,16 @@
         </div>
       </div>
 
-      <div class="shrink-0 p-2.5 sm:p-3 rounded-2xl bg-on-surface/5 border border-on-surface/5 shadow-inner flex items-center justify-center">
+      <div class="shrink-0 p-2.5 sm:p-3 rounded-xl bg-on-surface/5 border border-on-surface/5 shadow-inner flex items-center justify-center">
         <Icon 
           :icon="weatherIcon" 
           :class="statusTextClass"
-          class="text-[30px] sm:text-[38px]" 
+          class="text-[18px] sm:text-[18px]" 
         />
       </div>
     </div>
 
-    <div class="mt-4 sm:mt-6 flex items-center gap-2 relative z-10">
+    <div class="mt-2 sm:mt-4 flex items-center gap-1 relative z-10">
       <div 
         class="h-2 w-2 rounded-full animate-pulse"
         :class="statusColorClass"

@@ -12,9 +12,7 @@
         </h2>
       </div>
       
-      <v-btn @click="loadData" :loading="loading" prepend-icon="mdi-refresh" color="primary" variant="tonal" size="small" class="rounded-xl font-bold text-[10px] uppercase">
-        Actualiser les données
-      </v-btn>
+      <v-btn @click="loadData" :loading="loading" icon="mdi-refresh" color="primary" variant="tonal" size="small" class="rounded-xl shadow-sm"></v-btn>
     </header>
 
     <v-card variant="outlined" class="bg-surface p-3 md:p-4 rounded-3xl border-outline-variant shadow-sm">
@@ -188,22 +186,23 @@ const updateMarkers = () => {
                        (!selectedFilters.value.city || d.city === selectedFilters.value.city)
     
     const val = d[currentKey]
-    const size = Math.max((val / maxVal.value) * (isMobile ? 32 : 48), isMobile ? 20 : 26)
+    // Modification : Taille des points diminuée (ex: 24-32 au lieu de 32-48)
+    const size = Math.max((val / maxVal.value) * (isMobile ? 22 : 30), isMobile ? 14 : 18)
     
     const icon = L.divIcon({
       html: `
         <div style="
           background: ${selectedVariable.value.color}${isFiltered ? '33' : '11'}; 
-          border: 2px solid ${selectedVariable.value.color}${isFiltered ? 'FF' : '33'}; 
+          border: 1.5px solid ${selectedVariable.value.color}${isFiltered ? 'FF' : '33'}; 
           border-radius: 50%; 
           width: ${size}px; height: ${size}px; 
           display: flex; align-items: center; justify-content: center;
-          box-shadow: ${isFiltered ? `0 0 15px ${selectedVariable.value.color}66` : 'none'};
+          box-shadow: ${isFiltered ? `0 0 10px ${selectedVariable.value.color}44` : 'none'};
           transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
           transform: ${isFiltered ? 'scale(1.1)' : 'scale(0.9)'};
           opacity: ${isFiltered ? '1' : '0.3'};
         ">
-          <i class="mdi ${selectedVariable.value.icon}" style="color: ${selectedVariable.value.color}; font-size: ${size/2}px;"></i>
+          <i class="mdi ${selectedVariable.value.icon}" style="color: ${selectedVariable.value.color}; font-size: ${size/1.8}px;"></i>
         </div>`,
       className: 'custom-icon',
       iconSize: [size, size]
@@ -254,7 +253,7 @@ onMounted(async () => {
 })
 
 watch([() => activeVarIndex.value, () => theme.global.current.value.dark], () => {
-  loadData() // On recharge les données si la variable change
+  loadData() 
 })
 </script>
 

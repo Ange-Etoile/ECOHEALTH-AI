@@ -5,7 +5,7 @@ const api = axios.create({
 });
 
 export const getDashboardData = async (filters: any) => {
-  const response = await api.get('/api/kpi', { params: filters });
+  const response = await api.get('/api/dashboard-stats', { params: filters });
   return response.data;
 };
 

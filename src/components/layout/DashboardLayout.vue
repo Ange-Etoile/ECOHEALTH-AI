@@ -48,7 +48,7 @@
           </div>
         </header>
 
-        <div class="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-8">
+        <div class="flex-1 overflow-y-auto custom-scrollbar p-2 md:p-4">
           <router-view v-slot="{ Component }">
             <transition 
               name="page-fade" 

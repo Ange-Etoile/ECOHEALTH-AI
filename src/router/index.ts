@@ -32,6 +32,11 @@ const routes = [
         component: () => import('@/pages/CorrelationsView.vue'),
       },
       { 
+        path: 'regional-benchmark', 
+        name: 'Cartographie',
+        component: () => import('@/pages/RegionalProfile.vue'),
+      },
+      { 
         path: 'sunshine-hydric', 
         name: 'SunshineHydric',
         component: () => import('@/pages/SunshineAnalysis.vue'), 

@@ -10,7 +10,7 @@
           Surveillance <span class="text-secondary italic text-stroke">Spatiale</span>
         </h2>
         <p class="text-[10px] md:text-xs opacity-60 font-bold uppercase tracking-widest mt-1">
-          {{ currentZoneName }} — Focus Sanitaire PM2.5
+          {{ currentZoneName }} — {{ selectedFilters.year }} — Focus Sanitaire PM2.5
         </p>
       </div>
       
@@ -30,6 +30,9 @@
           <div class="absolute top-4 left-4 z-10 flex flex-col gap-2">
             <v-chip size="x-small" color="secondary" variant="flat" class="font-bold text-black uppercase">
               {{ citiesData.length }} Villes surveillées
+            </v-chip>
+            <v-chip size="x-small" color="surface" variant="flat" class="font-bold uppercase border border-outline-variant">
+              Année : {{ selectedFilters.year }}
             </v-chip>
           </div>
           <div id="riskMap" class="w-full h-full"></div>
@@ -62,7 +65,7 @@
 
           <div class="grid grid-cols-1 gap-4">
             <div class="p-4 rounded-2xl bg-error/10 border border-error/20">
-              <span class="text-[9px] font-black uppercase opacity-60 block">Zones Danger</span>
+              <span class="text-[9px] font-black uppercase opacity-60 block">Zones Danger ({{ selectedFilters.year }})</span>
               <span class="text-xl font-black text-error">{{ kpis.danger_cities_count }} <small class="text-[10px]">Villes</small></span>
             </div>
             <div class="p-4 rounded-2xl bg-secondary/10 border border-secondary/20">
@@ -96,7 +99,7 @@ const currentZoneName = computed(() => selectedFilters.value.region || 'Cameroun
 // --- LOGIQUE COULEURS SANITAIRES ---
 const getPMColor = (val) => {
   if (val <= 15) return 'success'
-  if (val <= 25) return 'warning'
+  if (val <= 25) return 'warning' 
   if (val <= 50) return 'orange'
   return 'error'
 }
@@ -107,14 +110,30 @@ const topCities = computed(() => [...citiesData.value].sort((a, b) => b.pm25_pro
 // --- ANALYSE DYNAMIQUE ---
 const riskAnalysis = computed(() => {
   if (!citiesData.value.length) return "Initialisation des capteurs..."
+  
   const trend = kpis.value.risk_trend
   const zone = currentZoneName.value
-  let text = `L'analyse spatiale pour <strong>${zone}</strong> indique `
-  
-  if (trend > 0) text += `une <span class="text-error font-bold font-mono">augmentation de ${trend}%</span> du risque par rapport à la moyenne nationale.`
-  else text += `une situation <span class="text-success font-bold">plus stable</span> avec une baisse de ${Math.abs(trend)}% des concentrations.`
+  const year = selectedFilters.value.year
+  const highestCity = topCities.value[0] // La ville la plus polluée de la sélection actuelle
 
-  text += `<br><br>La région <strong>${kpis.value.top_alert_region}</strong> concentre actuellement le plus grand nombre d'alertes PM2.5.`
+  let text = `Pour l'année <strong>${year}</strong>, l'analyse spatiale à <strong>${zone}</strong> indique `
+  
+  if (trend > 0) {
+    text += `une <span class="text-error font-bold font-mono">hausse des concentrations de ${trend}%</span> par rapport à la moyenne nationale.`
+  } else if (trend < 0) {
+    text += `une <span class="text-success font-bold">baisse des concentrations de ${Math.abs(trend)}%</span> par rapport à la moyenne nationale.`
+  } else {
+    text += `des concentrations <span class="text-info font-bold">équivalentes</span> à la moyenne nationale.`
+  }
+  text += `<br><br>`
+
+  // Logique conditionnelle pour le focus local vs régional
+  if (selectedFilters.value.region) {
+    text += `Au sein de cette région, la ville de <strong>${highestCity.city}</strong> présente le niveau le plus critique avec une moyenne de <strong>${highestCity.pm25_proxy.toFixed(1)} µg/m³</strong>.`
+  } else {
+    text += `La région <strong>${kpis.value.top_alert_region}</strong> concentre actuellement le plus grand nombre d'alertes sanitaires.`
+  }
+
   return text
 })
 
@@ -132,23 +151,26 @@ const renderMap = () => {
     type: 'scattergeo',
     lon: data.map(d => d.longitude),
     lat: data.map(d => d.latitude),
-    text: data.map(d => `<b>${d.city}</b><br>PM2.5: ${d.pm25_proxy.toFixed(1)} µg/m³<br>Région: ${d.region}`),
+    text: data.map(d => `<b>${d.city}</b><br>PM2.5: ${d.pm25_proxy.toFixed(1)} µg/m³<br>Année: ${selectedFilters.value.year}`),
     hoverinfo: 'text',
     marker: {
-      size: data.map(d => Math.max(d.pm25_proxy * 0.8, 12)), // Taille proportionnelle à la pollution
+      size: data.map(d => Math.max(d.pm25_proxy * 1.2, 10)), 
       color: data.map(d => d.pm25_proxy),
       colorscale: [
-        [0, '#4CAF50'], [0.15, '#4CAF50'],  // Vert
-        [0.15, '#FFC107'], [0.25, '#FFC107'], // Jaune
-        [0.25, '#FF9800'], [0.50, '#FF9800'], // Orange
-        [0.50, '#F44336'], [1, '#F44336']     // Rouge
+          [0, '#4CAF50'],     
+          [0.25, '#FFC107'], 
+          [0.5, '#FF9800'],  
+          [1, '#F44336']     
       ],
-      cmin: 0, cmax: 100,
+      cmin: 0, 
+      cmax: 80, 
       colorbar: {
         title: { text: 'µg/m³', font: { size: 10, color: isDark ? '#FFF' : '#000' } },
-        thickness: 10, len: 0.4
+        thickness: 8,
+        len: 0.5,
+        x: 0.9 
       },
-      line: { width: 1, color: isDark ? '#000' : '#FFF' }
+      line: { width: 1.5, color: isDark ? '#121212' : '#FFF' }
     }
   }
 
@@ -192,4 +214,8 @@ watch(() => theme.global.current.value.dark, renderMap)
 
 <style scoped>
 .text-justify { text-align: justify; }
+.text-stroke {
+  -webkit-text-stroke: 1px currentColor;
+  color: transparent;
+}
 </style>
