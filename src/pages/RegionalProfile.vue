@@ -78,7 +78,7 @@
               <v-icon color="primary" size="16">mdi-text-box-search-outline</v-icon>
               Analyse du contexte
             </h3>
-            <div class="text-xs md:text-sm leading-relaxed text-justify opacity-80" v-html="detailedExplanation"></div>
+            <div class="text-xs md:text-sm leading-relaxed text-justify opacity-90" v-html="detailedExplanation"></div>
           </v-card>
 
           <v-card variant="outlined" class="rounded-3xl p-5 border-outline-variant bg-surface shadow-sm">
@@ -92,13 +92,13 @@
                 <div class="flex-grow">
                   <div class="flex justify-between items-center mb-1">
                     <span class="text-[11px] font-bold truncate max-w-[140px] uppercase tracking-tight">{{ item.city }}</span>
-                    <span class="text-[10px] font-black" :style="{ color: selectedVariable.color }">
+                    <span class="text-[10px] font-black" :style="{ color: item.displayColor }">
                       {{ item.value.toFixed(1) }} <small>{{ selectedVariable.unit }}</small>
                     </span>
                   </div>
                   <v-progress-linear 
                     :model-value="(item.value / maxVal) * 100" 
-                    :color="selectedVariable.color" 
+                    :color="item.displayColor" 
                     height="7" 
                     rounded 
                     striped
@@ -140,6 +140,15 @@ const variables = [
 
 const selectedVariable = computed(() => variables.find(v => v.id === activeVarIndex.value))
 
+// Fonction utilitaire pour la couleur dynamique PM2.5
+const getDynamicColor = (val, type) => {
+  if (type !== 'pm25_proxy') return selectedVariable.value.color
+  if (val <= 15) return '#4CAF50'
+  if (val <= 25) return '#FFB300'
+  if (val <= 35) return '#FF9800'
+  return '#F44336'
+}
+
 const filteredData = computed(() => {
   return allRawData.value.filter(d => {
     const matchRegion = !selectedFilters.value.region || d.region === selectedFilters.value.region
@@ -154,17 +163,40 @@ const topImpactZones = computed(() => {
   return [...filteredData.value]
     .sort((a, b) => b[selectedVariable.value.key] - a[selectedVariable.value.key])
     .slice(0, 6)
-    .map(d => ({ city: d.city, region: d.region, value: d[selectedVariable.value.key] }))
+    .map(d => ({ 
+      city: d.city, 
+      region: d.region, 
+      value: d[selectedVariable.value.key],
+      displayColor: getDynamicColor(d[selectedVariable.value.key], activeVarIndex.value)
+    }))
 })
 
 const detailedExplanation = computed(() => {
   if (!filteredData.value.length) return "Aucune donnée disponible pour cette sélection."
+  
   const v = selectedVariable.value
   const top = topImpactZones.value[0]
   const zone = selectedFilters.value.city || selectedFilters.value.region || "Cameroun"
+  const annee = selectedFilters.value.year
+  const color = top.displayColor
+
+  let text = `<p>En <strong>${annee}</strong>, ce graphique cartographie l'intensité du facteur <strong>${v.label}</strong> à travers le territoire.</p>`
   
-  return `L'analyse comparative pour <strong>${zone}</strong> montre que le paramètre <strong>${v.label}</strong> atteint son apogée à <strong>${top.city}</strong> avec une valeur de <strong>${top.value.toFixed(1)}${v.unit}</strong>. 
-  <br><br>Dans le contexte régional, cette intensité influence la stabilité climatique et la qualité de l'air locale par rapport aux moyennes observées sur le reste du territoire.`
+  text += `<p class="mt-2">Pour <strong>${zone}</strong>, le point culminant se trouve à <span class="font-black" style="color: ${color}">${top.city}</span> avec une mesure de <span class="font-black" style="color: ${color}">${top.value.toFixed(1)} ${v.unit}</span>.</p>`
+
+  text += `<div class="mt-3 p-3 rounded-xl border border-outline-variant bg-surface-variant/5">`
+  if (v.id === 'precipitation_sum') {
+    text += `<span class="font-bold" style="color: ${color}">Rôle hydrologique :</span> En ${annee}, les volumes d'eau indiquent des zones de recharge importantes mais nécessitent une vigilance sur les risques d'inondations localisées.`
+  } else if (v.id === 'sunshine_duration') {
+    text += `<span class="font-bold" style="color: ${color}">Potentiel énergétique :</span> L'ensoleillement relevé en ${annee} confirme un gisement solaire majeur pour les zones marquées en jaune.`
+  } else if (v.id === 'wind_speed_10m_max') {
+    text += `<span class="font-bold" style="color: ${color}">Dynamique de l'air :</span> La circulation éolienne observée en ${annee} favorise la dispersion des polluants atmosphériques en zone urbaine.`
+  } else if (v.id === 'pm25_proxy') {
+    text += `<span class="font-bold" style="color: ${color}">Santé Publique :</span> L'analyse de ${annee} révèle des disparités critiques. Les zones rouges dépassent les seuils recommandés pour la santé respiratoire.`
+  }
+  text += `</div>`
+
+  return text
 })
 
 const initMap = () => {
@@ -186,23 +218,23 @@ const updateMarkers = () => {
                        (!selectedFilters.value.city || d.city === selectedFilters.value.city)
     
     const val = d[currentKey]
-    // Modification : Taille des points diminuée (ex: 24-32 au lieu de 32-48)
     const size = Math.max((val / maxVal.value) * (isMobile ? 22 : 30), isMobile ? 14 : 18)
+    const dynamicColor = getDynamicColor(val, activeVarIndex.value)
     
     const icon = L.divIcon({
       html: `
         <div style="
-          background: ${selectedVariable.value.color}${isFiltered ? '33' : '11'}; 
-          border: 1.5px solid ${selectedVariable.value.color}${isFiltered ? 'FF' : '33'}; 
+          background: ${dynamicColor}${isFiltered ? '33' : '11'}; 
+          border: 1.5px solid ${dynamicColor}${isFiltered ? 'FF' : '33'}; 
           border-radius: 50%; 
           width: ${size}px; height: ${size}px; 
           display: flex; align-items: center; justify-content: center;
-          box-shadow: ${isFiltered ? `0 0 10px ${selectedVariable.value.color}44` : 'none'};
+          box-shadow: ${isFiltered ? `0 0 10px ${dynamicColor}44` : 'none'};
           transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
           transform: ${isFiltered ? 'scale(1.1)' : 'scale(0.9)'};
           opacity: ${isFiltered ? '1' : '0.3'};
         ">
-          <i class="mdi ${selectedVariable.value.icon}" style="color: ${selectedVariable.value.color}; font-size: ${size/1.8}px;"></i>
+          <i class="mdi ${selectedVariable.value.icon}" style="color: ${dynamicColor}; font-size: ${size/1.8}px;"></i>
         </div>`,
       className: 'custom-icon',
       iconSize: [size, size]
@@ -213,7 +245,7 @@ const updateMarkers = () => {
         <div class="p-1">
           <div class="text-[10px] font-black uppercase text-primary">${d.region}</div>
           <div class="text-sm font-bold mb-1">${d.city}</div>
-          <div class="text-[11px] opacity-80">${selectedVariable.value.label}: <b>${val.toFixed(1)} ${selectedVariable.value.unit}</b></div>
+          <div class="text-[11px] opacity-80">${selectedVariable.value.label}: <b style="color:${dynamicColor}">${val.toFixed(1)} ${selectedVariable.value.unit}</b></div>
         </div>
       `)
       .addTo(markerLayer)
@@ -230,13 +262,15 @@ const updateMarkers = () => {
   }
 }
 
+// CORRECTION : Détection des changements de filtres (y compris l'année)
 const handleFilterChange = () => {
-  updateMarkers()
+  loadData()
 }
 
 const loadData = async () => {
   loading.value = true
   try {
+    // On passe bien l'année sélectionnée au service
     allRawData.value = await getComparativeData(selectedVariable.value.key, selectedFilters.value.year)
     await nextTick()
     updateMarkers()
@@ -252,19 +286,18 @@ onMounted(async () => {
   window.addEventListener('resize', updateMarkers)
 })
 
+// CORRECTION : Watcher pour l'index de variable et le thème
 watch([() => activeVarIndex.value, () => theme.global.current.value.dark], () => {
   loadData() 
 })
 </script>
 
 <style>
-/* Leaflet UI Customization */
 .leaflet-container { background: #0a0a0a !important; font-family: 'Inter', sans-serif !important; }
 .leaflet-popup-content-wrapper { background: rgba(15, 15, 15, 0.95) !important; color: white !important; border: 1px solid rgba(255,255,255,0.1) !important; backdrop-filter: blur(10px); border-radius: 16px !important; }
 .leaflet-popup-tip { background: rgba(15, 15, 15, 0.95) !important; }
 .custom-icon { background: none !important; border: none !important; }
 
-/* Custom Toggle Stylisé */
 .custom-toggle {
   -ms-overflow-style: none;
   scrollbar-width: none;

@@ -70,6 +70,11 @@ const routes = [
         path: 'future-projections', 
         name: 'FutureProjections',
         component: () => import('@/pages/FuturePrediction.vue') 
+      },
+      {
+        path: 'geoloc', 
+        name: 'Geolocalisation',
+        component: () => import('@/pages/GeolocView.vue')
       }
     ]
   }

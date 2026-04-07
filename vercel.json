@@ -1,4 +1,11 @@
 {
+  "redirects": [
+    {
+      "source": "/download-app",
+      "destination": "https://github.com/Ange-Etoile/ECOHEALTH-AI/releases/download/v1.0.0/ecohealth-ai-main-5f1108-debug.apk",
+      "permanent": false
+    }
+  ],
   "rewrites": [
     {
       "source": "/(.*)",

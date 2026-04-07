@@ -52,3 +52,7 @@ export const getGeneralPredictions = async () => {
   const response = await api.get('/api/predict/general-2026');
   return response.data;
 };
+export const getWeatherDataByCoords = async (lat: number, lon: number) => {
+  const response = await api.get('/api/weather-at-coords', { params: { lat, lon } });
+  return response.data;
+};

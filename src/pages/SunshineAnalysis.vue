@@ -34,7 +34,7 @@
 
     <v-row class="mt-2">
       <v-col cols="12" lg="8">
-        <v-card variant="outlined" class="rounded-3xl border-outline-variant bg-surface overflow-hidden h-[500px] md:h-[650px] shadow-sm relative">
+        <v-card variant="outlined" class="rounded-3xl border-outline-variant bg-surface overflow-hidden h-[600px] md:h-[650px] shadow-sm relative">
           <div class="absolute top-4 left-4 z-10 flex flex-col gap-2">
             <v-chip size="x-small" color="secondary" variant="flat" class="font-bold text-black uppercase">
               {{ citiesData.length }} Villes surveillées
@@ -104,7 +104,6 @@ const kpis = ref({ danger_cities_count: 0, top_alert_region: 'N/A', risk_trend: 
 
 const currentZoneName = computed(() => selectedFilters.value.region || 'Cameroun (National)')
 
-// --- LOGIQUE COULEURS SANITAIRES ---
 const getPMColor = (val) => {
   if (val <= 15) return 'success'
   if (val <= 25) return 'warning' 
@@ -115,14 +114,13 @@ const getPMColorText = (val) => `text-${getPMColor(val)}`
 
 const topCities = computed(() => [...citiesData.value].sort((a, b) => b.pm25_proxy - a.pm25_proxy).slice(0, 5))
 
-// --- ANALYSE DYNAMIQUE ---
 const riskAnalysis = computed(() => {
   if (!citiesData.value.length) return "Initialisation des capteurs..."
   
   const trend = kpis.value.risk_trend
   const zone = currentZoneName.value
   const year = selectedFilters.value.year
-  const highestCity = topCities.value[0] // La ville la plus polluée de la sélection actuelle
+  const highestCity = topCities.value[0]
 
   let text = `Pour l'année <strong>${year}</strong>, l'analyse spatiale à <strong>${zone}</strong> indique `
   
@@ -135,7 +133,6 @@ const riskAnalysis = computed(() => {
   }
   text += `<br><br>`
 
-  // Logique conditionnelle pour le focus local vs régional
   if (selectedFilters.value.region) {
     text += `Au sein de cette région, la ville de <strong>${highestCity.city}</strong> présente le niveau le plus critique avec une moyenne de <strong>${highestCity.pm25_proxy.toFixed(1)} µg/m³</strong>.`
   } else {
@@ -145,24 +142,26 @@ const riskAnalysis = computed(() => {
   return text
 })
 
-// --- CARTE PLOTLY SCATTERGEO ---
+// --- CARTE PLOTLY OPTIMISÉE ---
 const renderMap = () => {
   const isDark = theme.global.current.value.dark
   const data = citiesData.value
   if (!data.length) return
 
   const isMobile = window.innerWidth < 768
-  const center = { lon: 12.35, lat: 7.37 }
-  const scale = isMobile ? 5.5 : 7.2
+  // Recentrage pour mobile (Cameroun focus)
+  const center = { lon: 12.35, lat: 5.5 } 
+  const scale = isMobile ? 8.5 : 7.2
 
   const trace = {
     type: 'scattergeo',
     lon: data.map(d => d.longitude),
     lat: data.map(d => d.latitude),
-    text: data.map(d => `<b>${d.city}</b><br>PM2.5: ${d.pm25_proxy.toFixed(1)} µg/m³<br>Année: ${selectedFilters.value.year}`),
+    text: data.map(d => `<b>${d.city}</b><br>PM2.5: ${d.pm25_proxy.toFixed(1)} µg/m³`),
     hoverinfo: 'text',
     marker: {
-      size: data.map(d => Math.max(d.pm25_proxy * 1.2, 10)), 
+      // Taille diminuée sur mobile (base 6-8px) vs Desktop (base 10-12px)
+      size: data.map(d => Math.max(d.pm25_proxy * (isMobile ? 0.6 : 1.2), isMobile ? 6 : 10)), 
       color: data.map(d => d.pm25_proxy),
       colorscale: [
           [0, '#4CAF50'],     
@@ -178,7 +177,7 @@ const renderMap = () => {
         len: 0.5,
         x: 0.9 
       },
-      line: { width: 1.5, color: isDark ? '#121212' : '#FFF' }
+      line: { width: 1, color: isDark ? '#121212' : '#FFF' }
     }
   }
 
@@ -187,7 +186,7 @@ const renderMap = () => {
       scope: 'africa', center,
       projection: { scale, type: 'mercator' },
       showland: true, landcolor: isDark ? '#1a1a1a' : '#f5f5f5',
-      subunitcolor: '#444', bgcolor: 'rgba(0,0,0,0)',
+      subunitcolor: isDark ? '#333' : '#ccc', bgcolor: 'rgba(0,0,0,0)',
       showcountries: true, countrycolor: '#666'
     },
     margin: { t: 0, b: 0, l: 0, r: 0 },
@@ -222,8 +221,4 @@ watch(() => theme.global.current.value.dark, renderMap)
 
 <style scoped>
 .text-justify { text-align: justify; }
-.text-stroke {
-  -webkit-text-stroke: 1px currentColor;
-  color: transparent;
-}
 </style>

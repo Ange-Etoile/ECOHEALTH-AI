@@ -66,7 +66,7 @@
         <div class="h-px bg-on-surface/5 mb-4 mx-1 w-full"></div>
         
         <button 
-          class="flex items-center gap-3 w-full h-10 px-3 rounded-xl border-none bg-transparent text-on-surface/40 hover:bg-error/10 hover:text-error transition-all duration-200 group relative"
+          class="flex items-center gap-3 w-full h-10 px-3 rounded-xl border-none bg-error text-on-surface/40 hover:bg-error/10 hover:text-error transition-all duration-200 group relative"
           :class="{ 'justify-center !px-0 !w-10': isRail && !mobile }"
           @click="logout"
         >
@@ -130,6 +130,7 @@ const menuItems = [
   { title: 'Performance IA', to: '/performance-ia', icon: 'mdi-brain' },
   { heading: 'INTELLIGENCE' },
   { title: 'Prévisions 2026', icon: 'mdi-crystal-ball', to: '/predictions-2026' },
+  { title: 'Analyse de Proximité', to: '/geoloc', icon: 'mdi-crosshairs-gps', badge: 'LIVE', color: 'error'},
   { title: 'Prévisions Futures', icon: 'mdi-crystal-ball', to: '/future-projections', badge: 'NEW', color: 'secondary'},
   { heading: 'L\'ÉQUIPE' }, 
   { title: 'À Propos',      icon: 'mdi-account-group-outline',   to: '/about' },
