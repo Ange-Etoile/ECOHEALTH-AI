@@ -1,16 +1,17 @@
 <template>
   <div v-if="options.regions.length > 0" 
-       class="relative flex flex-wrap items-stretch bg-[#0d0f18]/90 backdrop-blur-xl border border-white/[0.08] rounded-2xl overflow-hidden shadow-2xl mb-8">
+       class="relative flex flex-col lg:flex-row items-stretch bg-surface border border-outline-variant rounded-[24px] md:rounded-2xl overflow-hidden shadow-sm mb-8 transition-all duration-300">
     
-    <div class="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-primary to-transparent opacity-50"></div>
+    <div class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-primary to-transparent opacity-50"></div>
 
-    <div class="hidden lg:flex items-center px-6 border-r border-white/[0.05] bg-white/[0.02]">
+    <div class="flex items-center px-6 py-3 lg:py-0 border-b lg:border-b-0 lg:border-r border-outline-variant bg-primary/[0.03]">
+      <v-icon size="small" color="primary" class="mr-2">mdi-brain-outline</v-icon>
       <span class="text-[10px] font-black uppercase tracking-[0.3em] text-primary">Intelligence Filters</span>
     </div>
 
-    <div class="filter-cell flex-1 min-w-[200px] border-r border-white/[0.05]">
-      <div class="cell-icon">
-        <span class="iconify text-primary/60 text-xl" data-icon="solar:map-point-wave-bold-duotone"></span>
+    <div class="filter-cell flex-1 min-w-[200px] border-b lg:border-b-0 lg:border-r border-outline-variant">
+      <div class="cell-icon hidden sm:flex">
+        <v-icon size="22" color="primary" class="opacity-60">mdi-map-marker-path</v-icon>
       </div>
       <v-select
         v-model="regionModel"
@@ -21,13 +22,13 @@
         class="filter-select"
         hide-details
         clearable
-        placeholder="National"
+        placeholder="National (Cameroun)"
       />
     </div>
 
-    <div class="filter-cell w-[180px] border-r border-white/[0.05]">
-      <div class="cell-icon">
-        <span class="iconify text-primary/60 text-xl" data-icon="solar:calendar-bold-duotone"></span>
+    <div class="filter-cell w-full lg:w-[180px] border-b lg:border-b-0 lg:border-r border-outline-variant">
+      <div class="cell-icon hidden sm:flex">
+        <v-icon size="22" color="primary" class="opacity-60">mdi-calendar-clock</v-icon>
       </div>
       <v-select
         v-model="yearModel"
@@ -40,11 +41,11 @@
       />
     </div>
 
-    <div class="flex items-center px-6 bg-primary/[0.03]">
+    <div class="flex items-center justify-center px-6 py-4 lg:py-0 bg-primary/[0.02] min-w-[130px]">
       <v-progress-circular v-if="loading" indeterminate size="18" width="2" color="primary" />
       <div v-else class="flex items-center gap-2">
-        <div class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.8)]"></div>
-        <span class="text-[9px] font-black text-emerald-400 uppercase tracking-tighter">Sync Space</span>
+        <div class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
+        <span class="text-[9px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-tighter">Sync Space</span>
       </div>
     </div>
   </div>
@@ -84,25 +85,52 @@ const yearModel = computed({
 .filter-cell {
   display: flex;
   align-items: center;
-  padding: 0 16px;
+  padding: 10px 16px;
   gap: 12px;
   transition: all 0.2s ease;
+  min-height: 68px;
 }
-.filter-cell:hover { background: rgba(255, 255, 255, 0.02); }
-.cell-icon { display: flex; align-items: center; }
 
+@media (min-width: 1024px) {
+  .filter-cell {
+    padding: 0 20px;
+    min-height: auto;
+  }
+}
+
+.filter-cell:hover { 
+  background: rgba(var(--v-theme-primary), 0.03); 
+}
+
+.cell-icon { 
+  display: flex; 
+  align-items: center; 
+  justify-content: center;
+}
+
+/* Typography & Adapative Colors */
 .filter-select :deep(.v-field__input) {
   font-size: 0.85rem !important;
-  font-weight: 700 !important;
-  color: #fff !important;
+  font-weight: 800 !important;
+  color: rgb(var(--v-theme-on-surface)) !important;
   padding: 14px 0 !important;
 }
+
 .filter-select :deep(.v-label) {
   font-size: 0.65rem !important;
-  color: rgba(255,255,255,0.3) !important;
+  color: rgb(var(--v-theme-on-surface), 0.5) !important;
   font-weight: 900 !important;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.1em;
 }
-.filter-select :deep(.v-field__outline) { display: none !important; }
+
+.filter-select :deep(.v-field__outline) { 
+  display: none !important; 
+}
+
+/* Style spécifique au placeholder pour qu'il ne soit pas trop sombre */
+.filter-select :deep(input::placeholder) {
+  color: rgb(var(--v-theme-on-surface), 0.3) !important;
+  opacity: 1;
+}
 </style>

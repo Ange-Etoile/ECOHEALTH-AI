@@ -1,70 +1,59 @@
 <template>
   <div v-if="options.regions.length > 0" 
-       class="relative flex flex-wrap items-stretch bg-[#0d0f18]/90 backdrop-blur-xl border border-white/[0.08] rounded-2xl overflow-hidden shadow-2xl mb-8">
+       class="relative bg-surface border border-outline-variant rounded-2xl overflow-hidden shadow-sm mb-6 transition-all duration-300">
     
-    <div class="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-primary to-transparent opacity-50"></div>
+    <div class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-primary to-transparent opacity-50"></div>
 
-    <div class="hidden lg:flex items-center px-6 border-r border-white/[0.05] bg-white/[0.02]">
-      <span class="text-[10px] font-black uppercase tracking-[0.3em] text-primary">Intelligence Filters</span>
-    </div>
-
-    <div class="filter-cell flex-1 min-w-[160px] border-r border-white/[0.05]">
-      <div class="cell-icon">
-        <span class="iconify text-primary/60" data-icon="solar:map-point-wave-bold-duotone"></span>
+    <div class="flex flex-col lg:flex-row lg:items-center">
+      
+      <div class="flex items-center px-4 py-3 lg:h-14 lg:px-6 border-b lg:border-b-0 lg:border-r border-outline-variant bg-primary/[0.03]">
+        <v-progress-circular v-if="loading" indeterminate size="14" width="2" color="primary" class="mr-3" />
+        <v-icon v-else size="18" color="primary" class="mr-2">mdi-filter-variant</v-icon>
+        <span class="text-[10px] font-black uppercase tracking-[0.15em] text-primary whitespace-nowrap">Filtres</span>
       </div>
-      <v-select
-        v-model="regionModel"
-        :items="options.regions"
-        label="Région"
-        variant="plain"
-        density="compact"
-        class="filter-select"
-        hide-details
-        clearable
-        placeholder="Choisir"
-      />
-    </div>
 
-    <div class="filter-cell flex-1 min-w-[160px] border-r border-white/[0.05]"
-         :class="{'opacity-30 grayscale pointer-events-none': !regionModel}">
-      <div class="cell-icon">
-        <span class="iconify text-primary/60" data-icon="solar:city-bold-duotone"></span>
+      <div class="filter-cell flex-1 border-b lg:border-b-0 lg:border-r border-outline-variant">
+        <v-select
+          v-model="regionModel"
+          :items="options.regions"
+          label="Région"
+          variant="plain"
+          density="compact"
+          class="filter-select"
+          hide-details
+          clearable
+          placeholder="Choisir"
+        />
       </div>
-      <v-select
-        v-model="cityModel"
-        :items="availableCities"
-        :label="regionModel ? 'Ville' : 'Sélectionnez Région'"
-        variant="plain"
-        density="compact"
-        class="filter-select"
-        hide-details
-        :disabled="!regionModel"
-        clearable
-        placeholder="Toutes"
-      />
-    </div>
 
-    <div class="filter-cell w-[130px] border-r border-white/[0.05]">
-      <div class="cell-icon">
-        <span class="iconify text-primary/60" data-icon="solar:calendar-bold-duotone"></span>
+      <div class="filter-cell flex-[1.2] border-b lg:border-b-0 lg:border-r border-outline-variant"
+           :class="{'opacity-40 grayscale pointer-events-none': !regionModel}">
+        <v-select
+          v-model="cityModel"
+          :items="availableCities"
+          :label="regionModel ? 'Ville' : 'Région requise'"
+          variant="plain"
+          density="compact"
+          class="filter-select"
+          hide-details
+          :disabled="!regionModel"
+          clearable
+          placeholder="Toutes"
+        />
       </div>
-      <v-select
-        v-model="yearModel"
-        :items="options.annees"
-        label="Année"
-        variant="plain"
-        density="compact"
-        class="filter-select"
-        hide-details
-      />
-    </div>
 
-    <div class="flex items-center px-6 bg-primary/[0.03]">
-      <v-progress-circular v-if="loading" indeterminate size="18" width="2" color="primary" />
-      <div v-else class="flex items-center gap-2">
-        <div class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.8)]"></div>
-        <span class="text-[9px] font-black text-emerald-400 uppercase tracking-tighter">Sync Space</span>
+      <div class="filter-cell flex-1 lg:max-w-[120px]">
+        <v-select
+          v-model="yearModel"
+          :items="options.annees"
+          label="Année"
+          variant="plain"
+          density="compact"
+          class="filter-select"
+          hide-details
+        />
       </div>
+
     </div>
   </div>
 </template>
@@ -80,18 +69,14 @@ const props = defineProps<{
 
 const emit = defineEmits(['update:modelValue', 'change'])
 
-// Dans FilterBar.vue
 const availableCities = computed(() => {
-  // On utilise le dictionnaire envoyé par le nouveau backend
   if (!props.modelValue.region || !props.options.citiesData) return []
   return props.options.citiesData[props.modelValue.region] || []
 })
 
-// Getters / Setters pour v-model propre
 const regionModel = computed({
   get: () => props.modelValue.region,
   set: (val) => {
-    // Reset de la ville quand on change de région pour éviter les erreurs d'analyse
     emit('update:modelValue', { ...props.modelValue, region: val, city: null })
     emit('change')
   }
@@ -118,25 +103,52 @@ const yearModel = computed({
 .filter-cell {
   display: flex;
   align-items: center;
-  padding: 0 16px;
-  gap: 12px;
-  transition: all 0.2s ease;
+  padding: 4px 16px;
+  min-height: 56px;
+  transition: background 0.2s ease;
 }
-.filter-cell:hover:not(.opacity-30) { background: rgba(255, 255, 255, 0.02); }
-.cell-icon { display: flex; align-items: center; }
 
-.filter-select :deep(.v-field__input) {
-  font-size: 0.85rem !important;
-  font-weight: 700 !important;
-  color: #fff !important;
-  padding: 14px 0 !important;
+@media (min-width: 1024px) {
+  .filter-cell {
+    min-height: 56px;
+    padding: 0 20px;
+  }
 }
+
+.filter-cell:hover:not(.opacity-40) { 
+  background: rgba(var(--v-theme-primary), 0.02); 
+}
+
+/* Taille de texte revue et correction de visibilité */
+.filter-select :deep(.v-field__input) {
+  font-size: 0.85rem !important; 
+  font-weight: 700 !important;
+  color: rgb(var(--v-theme-on-surface)) !important;
+  opacity: 1 !important; /* Force la visibilité */
+  padding: 4px 0 !important;
+  display: flex;
+  align-items: center;
+}
+
+/* Correction spécifique pour l'affichage de la valeur sélectionnée */
+.filter-select :deep(.v-select__selection-text) {
+  color: rgb(var(--v-theme-on-surface)) !important;
+}
+
 .filter-select :deep(.v-label) {
   font-size: 0.65rem !important;
-  color: rgba(255,255,255,0.3) !important;
-  font-weight: 900 !important;
+  color: rgb(var(--v-theme-primary)) !important;
+  font-weight: 800 !important;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  margin-bottom: 2px;
 }
+
 .filter-select :deep(.v-field__outline) { display: none !important; }
+
+/* Placeholder plus discret */
+.filter-select :deep(input::placeholder) {
+  font-size: 0.8rem;
+  opacity: 0.4;
+}
 </style>

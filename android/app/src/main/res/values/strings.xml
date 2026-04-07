@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">ecohealth-ai</string>
+    <string name="title_activity_main">ecohealth-ai</string>
+    <string name="package_name">com.etoile.ecohealthai</string>
+    <string name="custom_url_scheme">com.etoile.ecohealthai</string>
+</resources>
