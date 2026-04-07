@@ -23,7 +23,7 @@
       <div v-if="loading" class="h-9 w-20 rounded-md bg-on-surface/10 animate-pulse"></div>
 
       <div v-else class="flex items-baseline gap-1">
-        <span class="text-xl font-black leading-none" :class="colorStyle.num">
+        <span class="text-lg font-black leading-none" :class="colorStyle.num">
           {{ value ?? '–' }}
         </span>
         <span v-if="unit" class="text-xs opacity-50 dark:text-white/35 font-medium">

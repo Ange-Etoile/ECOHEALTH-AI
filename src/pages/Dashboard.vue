@@ -35,10 +35,11 @@
       />
     </v-card>
 
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+    <div class="grid grid-cols-2 lg:grid-cols-5 gap-3 md:gap-4">
       <KpiBox label="Moyenne PM2.5" :value="stats.pm25 || 0" unit="µg/m³" icon="mdi-blur" :color="stats.pm25 > 40 ? 'red' : 'green'" :sub="getAirStatus(stats.pm25)" :loading="loading" />
       <KpiBox label="Top Région" :value="stats.top_region || '--'" unit="" icon="mdi-map-marker-radius" color="blue" sub="Zone en Alerte" :loading="loading" />
       <KpiBox label="Pic Temporel" :value="stats.critical_month || '--'" unit="" icon="mdi-calendar-clock" color="orange" sub="Mois Critique" :loading="loading" />
+      <KpiBox label="Niveau d'alerte National" :value="stats.vigilance_msg || '--'" unit="" icon="mdi-shield-alert" :color="stats.vigilance_msg === 'Danger' ? 'red' : 'green'" sub="Indice de Risque" :loading="loading" />
       <KpiBox label="Indice Santé" :value="getAirStatus(stats.pm25)" unit="" icon="mdi-heart-pulse" :color="stats.pm25 > 55 ? 'red' : 'yellow'" :sub="stats.pm25 > 55 ? 'Risque Élevé' : 'Normal'" :loading="loading" />
     </div>
 
@@ -49,23 +50,20 @@
           <div id="evolutionPlot" class="w-full h-[300px]"></div>
         </ChartCard>
 
-        <ChartCard number="02" title="Impact Précipitations" badge="LESSIVAGE">
+        <ChartCard number="02" title="Distribution par Région" badge="DENSITÉ">
+          <div id="violinPlot" class="w-full h-[300px]"></div>
+        </ChartCard>
+
+        <ChartCard number="03" title="Impact Précipitations" badge="LESSIVAGE">
           <div id="precipPlot" class="w-full h-[300px]"></div>
         </ChartCard>
 
-        <ChartCard number="03" title="Comparatif Régional" badge="PM2.5">
+        <ChartCard number="04" title="Comparatif Régional" badge="PM2.5">
           <div id="regionBarPlot" class="w-full h-[300px]"></div>
         </ChartCard>
-
-        <div class="bg-primary/5 border border-primary/10 p-4 rounded-2xl flex gap-4 items-start">
-          <v-icon color="primary" size="small">mdi-auto-fix</v-icon>
-          <p class="text-[11px] leading-relaxed font-medium opacity-80 text-primary">
-            <b>Analyse :</b> La corrélation entre le cumul de pluie et la baisse des PM2.5 est confirmée.
-          </p>
-        </div>
       </div>
 
-      <div class="col-span-12 lg:col-span-4">
+      <div class="max-h-[400px] col-span-12 lg:col-span-4">
         <v-card class="rounded-[24px] border border-outline-variant p-5 h-full shadow-none bg-surface-light">
           <h3 class="text-[10px] font-black uppercase tracking-[0.2em] opacity-40 mb-6 flex items-center gap-2">Classement Régional</h3>
           <div class="space-y-3">
@@ -88,7 +86,7 @@
 
     <div v-if="initialLoading" class="py-20 flex flex-col items-center justify-center space-y-4">
       <v-progress-circular indeterminate color="primary" size="40" width="4" />
-      <p class="text-[10px] font-black uppercase tracking-[0.3em] opacity-30">Initialisation de l'IA...</p>
+      <p class="text-[10px] font-black uppercase tracking-[0.3em] opacity-30">Initialisation des composants...</p>
     </div>
   </div>
 </template>
@@ -103,11 +101,12 @@ import { getDashboardData, getFilterOptions } from '@/services/dataService'
 
 const loading = ref(false)
 const initialLoading = ref(true)
-const stats = ref({ pm25: 0, top_region: '--', critical_month: '--' })
+const stats = ref({ pm25: 0, top_region: '--', critical_month: '--', vigilance_msg: '--' })
 const chartData = ref({ 
   evolution: { months: [], pm25: [], temp: [] }, 
   precip: { months: [], pm25: [], pre_cul: [] }, 
-  regions: [] 
+  regions: [],
+  distribution: { x: [], y: [] }
 })
 const filterOptions = ref({ regions: [], annees: [] })
 const selectedFilters = ref({ region: null, year: 2025 })
@@ -138,7 +137,22 @@ const drawPlots = () => {
     }
   ], { ...commonLayout, yaxis2: { overlaying: 'y', side: 'right', showgrid: false } }, { responsive: true, displayModeBar: false })
 
-  // 2. Precip Plot
+  // 2. Violin Plot (Nouveau)
+  Plotly.react('violinPlot', [
+    {
+      type: 'violin',
+      y: chartData.value.distribution.y,
+      x: chartData.value.distribution.x,
+      points: 'none',
+      box: { visible: true },
+      line: { color: '#6366f1' },
+      fillcolor: 'rgba(99, 102, 241, 0.2)',
+      meanline: { visible: true },
+      name: 'Distribution PM2.5'
+    }
+  ], { ...commonLayout }, { responsive: true, displayModeBar: false })
+
+  // 3. Precip Plot
   Plotly.react('precipPlot', [
     { 
       x: chartData.value.precip.months, y: chartData.value.precip.pre_cul, 
@@ -151,7 +165,7 @@ const drawPlots = () => {
     }
   ], { ...commonLayout, yaxis2: { overlaying: 'y', side: 'right', showgrid: false } }, { responsive: true, displayModeBar: false })
 
-  // 3. BarPlot Régional
+  // 4. BarPlot Régional
   Plotly.react('regionBarPlot', [{
     x: chartData.value.regions.map(r => r.name),
     y: chartData.value.regions.map(r => r.value),
@@ -188,7 +202,7 @@ onMounted(async () => {
   filterOptions.value = await getFilterOptions()
   await loadAllData()
   window.addEventListener('resize', () => {
-    ['evolutionPlot', 'precipPlot', 'regionBarPlot'].forEach(id => {
+    ['evolutionPlot', 'violinPlot', 'precipPlot', 'regionBarPlot'].forEach(id => {
        const el = document.getElementById(id)
        if (el) Plotly.Plots.resize(id)
     })
@@ -197,14 +211,3 @@ onMounted(async () => {
 
 onUnmounted(() => window.removeEventListener('resize', () => {}))
 </script>
-
-<style scoped>
-:deep(.main-svg) { background: transparent !important; }
-:deep(.js-plotly-plot .plotly .modebar) { display: none !important; }
-.chart-skel {
-  border-radius: 16px;
-  background: rgba(150, 150, 150, 0.1);
-  animation: pulse 1.5s infinite;
-}
-@keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 0.8; } }
-</style>
