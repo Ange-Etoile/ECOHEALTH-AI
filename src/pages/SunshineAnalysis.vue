@@ -1,24 +1,32 @@
 <template>
   <div class="max-w-7xl mx-auto space-y-6 p-4 md:p-6 text-on-surface transition-colors duration-500">
     
-    <header class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-outline-variant pb-6">
+    <header class="flex flex-col sm:flex-row sm:items-center justify-between gap-6 border-b border-outline-variant pb-6">
       <div class="space-y-1">
-        <div class="flex items-center gap-2 text-secondary font-black uppercase tracking-widest text-[10px]">
-          <v-icon size="small" color="secondary">mdi-map-marker-radius</v-icon> Surveillance Géospatiale
+        <div class="flex items-center gap-2 text-secondary font-black uppercase tracking-[0.2em] text-[10px]">
+          <v-icon size="x-small" color="secondary">mdi-map-marker-radius</v-icon> 
+          Surveillance Géospatiale
         </div>
-        <h2 class="text-xl md:text-5xl font-black tracking-tighter uppercase leading-none">
-          Surveillance <span class="text-secondary italic text-stroke">Spatiale</span>
+        <h2 class="text-3xl md:text-5xl font-black tracking-tighter uppercase leading-none">
+          Surveillance <span class="text-secondary italic">Spatiale</span>
         </h2>
-        <p class="text-[10px] md:text-xs opacity-60 font-bold uppercase tracking-widest mt-1">
-          {{ currentZoneName }} — {{ selectedFilters.year }} — Focus Sanitaire PM2.5
+        <p class="text-[10px] md:text-xs opacity-50 font-bold uppercase tracking-widest mt-2">
+          {{ currentZoneName || 'Vue Nationale' }} — {{ selectedFilters.year }} — Focus Sanitaire PM2.5
         </p>
       </div>
       
-      <v-btn @click="loadData" :loading="loading" prepend-icon="mdi-refresh" color="secondary" variant="elevated" 
-        class="rounded-xl font-bold text-[10px] md:text-xs text-black w-full sm:w-auto">
-        Actualiser la carte
-      </v-btn>
+      <div class="flex items-center gap-4">
+        <v-btn 
+          @click="loadData" 
+          :loading="loading" 
+          icon="mdi-refresh" 
+          color="secondary" 
+          variant="tonal" 
+          class="rounded-xl shadow-sm"
+        ></v-btn>
+      </div>
     </header>
+
 
     <v-card variant="outlined" class="bg-surface p-4 md:p-6 rounded-3xl border-outline-variant shadow-sm">
       <SimpleFilterBar v-model="selectedFilters" :options="filterOptions" :loading="loading" @change="loadData" />

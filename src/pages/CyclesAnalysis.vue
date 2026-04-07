@@ -1,30 +1,33 @@
 <template>
   <div class="max-w-7xl mx-auto space-y-6 p-4 md:p-6 text-on-surface transition-colors duration-300">
 
-    <header class="relative overflow-hidden rounded-2xl border border-on-surface/10 bg-surface-variant dark:bg-[#0d0f18] p-6 md:p-8">
-      <div class="absolute inset-0 bg-gradient-to-br from-orange-500/5 via-transparent to-blue-500/5 pointer-events-none"></div>
-      <div class="relative flex flex-col md:flex-row md:items-end justify-between gap-4">
-        <div class="space-y-2">
-          <div class="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.22em] text-orange-500 dark:text-orange-400/80">
-            <span class="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse"></span>
-            Analyse Temporelle & Saisonnière
-          </div>
-          <h1 class="text-3xl md:text-5xl font-black tracking-tighter text-on-surface dark:text-white">
-            Cycles de <span class="text-orange-500 italic">Pollution</span>
-          </h1>
-          <p class="text-sm text-on-surface/60 dark:text-white/40 max-w-xl leading-relaxed">
-            Variations PM2.5 selon la saisonnalité — Harmattan (Nov–Mar) vs Saison des pluies (Avr–Oct).
-          </p>
+    <header class="flex flex-col sm:flex-row sm:items-center justify-between gap-6 border-b border-outline-variant pb-6">
+      <div class="space-y-1">
+        <div class="flex items-center gap-2 text-orange-500 font-black uppercase tracking-[0.2em] text-[10px]">
+          <v-icon size="x-small">mdi-sync</v-icon> Analyse Temporelle & Saisonnière
         </div>
-        <div class="flex gap-2">
-          <span class="px-3 py-1.5 rounded-lg bg-orange-500/10 border border-orange-500/20 text-[11px] font-bold text-orange-600 dark:text-orange-400">🌵 Harmattan</span>
-          <span class="px-3 py-1.5 rounded-lg bg-blue-500/10 border border-blue-500/20 text-[11px] font-bold text-blue-600 dark:text-blue-400">🌧️ Pluies</span>
-        </div>
+        <h2 class="text-3xl md:text-5xl font-black tracking-tighter uppercase leading-none">
+          Cycles de <span class="text-orange-500 italic">Pollution</span>
+        </h2>
+        <p class="text-[10px] md:text-xs opacity-50 font-bold uppercase tracking-widest mt-2">
+          Variations PM2.5 — {{ selectedFilters.region || 'Vue Nationale' }} ({{ selectedFilters.year }})
+        </p>
+      </div>
+      
+      <div class="flex items-center gap-4">
+        <v-btn 
+          @click="loadData" 
+          :loading="loading" 
+          icon="mdi-refresh" 
+          color="orange" 
+          variant="tonal" 
+          class="rounded-xl shadow-sm"
+        ></v-btn>
       </div>
     </header>
 
     <v-card variant="outlined" class="bg-surface p-3 md:p-4 rounded-3xl border-outline-variant shadow-sm">
-      <FilterBar 
+      <SimpleFilterBar 
         v-model="selectedFilters" 
         :options="filterOptions" 
         :loading="loading" 
@@ -71,15 +74,15 @@
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick, computed, onBeforeUnmount, watch } from 'vue'
+import { ref, onMounted, nextTick, watch, onUnmounted } from 'vue'
 import Plotly from 'plotly.js-dist-min'
 import { getCyclesAnalysis, getFilterOptions } from '@/services/dataService'
-import FilterBar from '@/components/dashboard/FilterBar.vue'
+import SimpleFilterBar from '@/components/dashboard/SimpleFilterBar.vue'
 import KpiBox from '@/components/dashboard/KpiBox.vue'
 import ChartCard from '@/components/dashboard/ChartCard.vue'
 
 const loading = ref(false)
-const filterOptions = ref({ regions: [], years: [] })
+const filterOptions = ref({ regions: [], annees: [] })
 const selectedFilters = ref({ region: null, year: 2025 })
 const kpis = ref({})
 const rawData = ref({})
@@ -111,7 +114,6 @@ const renderCharts = () => {
   const d = rawData.value
   if (!d || Object.keys(d).length === 0) return
 
-  // 01. Timeline
   if (elTimeline.value && d.timeline?.length > 0) {
     Plotly.react(elTimeline.value, [{
       x: d.timeline.map(r => r.date),
@@ -122,7 +124,6 @@ const renderCharts = () => {
     }], GET_LAYOUT(), { responsive: true, displayModeBar: false })
   }
 
-  // 02. Seasonal (CORRIGÉ ICI)
   if (elSeasonal.value && d.seasonal?.length > 0) {
     Plotly.react(elSeasonal.value, [
       { 
@@ -147,10 +148,9 @@ const renderCharts = () => {
         showgrid: false, 
         title: { text: 'mm', font: { size: 10 } } 
       } 
-    }), { responsive: true })
+    }), { responsive: true, displayModeBar: false })
   }
 
-  // 03. Bilan
   if (elBilan.value && d.seasonal?.length > 0) {
     Plotly.react(elBilan.value, [{
       x: d.seasonal.map(r => r.mois_nom), 
@@ -158,15 +158,14 @@ const renderCharts = () => {
       name: 'Bilan Hydrique',
       type: 'bar',
       marker: { color: d.seasonal.map(r => r.bilan >= 0 ? '#22c55e' : '#ef4444') }
-    }], GET_LAYOUT(), { responsive: true })
+    }], GET_LAYOUT(), { responsive: true, displayModeBar: false })
   }
 
-  // 04. Violin
   if (elViolin.value && d.violin) {
     const traces = []
     if (d.violin.dry) traces.push({ y: d.violin.dry, name: 'Saison Sèche', type: 'violin', line: { color: '#f97316' } })
     if (d.violin.wet) traces.push({ y: d.violin.wet, name: 'Saison Pluies', type: 'violin', line: { color: '#3b82f6' } })
-    if (traces.length) Plotly.react(elViolin.value, traces, GET_LAYOUT(), { responsive: true })
+    if (traces.length) Plotly.react(elViolin.value, traces, GET_LAYOUT(), { responsive: true, displayModeBar: false })
   }
 }
 
@@ -192,7 +191,7 @@ onMounted(async () => {
   mediaQuery.addEventListener('change', e => isDark.value = e.matches)
   try {
     const opts = await getFilterOptions()
-    filterOptions.value = { regions: opts?.regions || [], years: opts?.years || [2024, 2025] }
+    filterOptions.value = { regions: opts?.regions || [], annees: opts?.years || [2024, 2025] }
   } catch (e) {}
   await loadData()
   window.addEventListener('resize', () => {
@@ -201,6 +200,8 @@ onMounted(async () => {
     })
   })
 })
+
+onUnmounted(() => window.removeEventListener('resize', () => {}))
 </script>
 
 <style scoped>
@@ -210,4 +211,6 @@ onMounted(async () => {
   animation: pulse 1.5s infinite;
 }
 @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 0.8; } }
+:deep(.main-svg) { background: transparent !important; }
+:deep(.js-plotly-plot .plotly .modebar) { display: none !important; }
 </style>
